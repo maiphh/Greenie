@@ -62,7 +62,7 @@ class User extends StatelessWidget {
                                       height: 80,
                                     ),
                                     const Text(
-                                      'Yen Nhi',
+                                      'User',
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontFamily: 'Worksans',
