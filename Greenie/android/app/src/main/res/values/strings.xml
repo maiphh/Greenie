@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">"Greenie"</string>
+    <string name="facebook_app_id">1502077603606989</string>
+    <string name="fb_login_protocol_scheme">fb1502077603606989</string>
+    <string name="facebook_client_token">c770d13b805801ec649926323008761d</string>
+
+
+</resources>

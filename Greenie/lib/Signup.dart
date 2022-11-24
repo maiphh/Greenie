@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -9,7 +11,11 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
-  bool isChecked = false;
+  @override
+  final _auth = FirebaseAuth.instance;
+  late String phone;
+  late String pass;
+  bool confirmation = false;
 
   @override
   Widget build(BuildContext context) {
@@ -58,32 +64,29 @@ class _SignupState extends State<Signup> {
                       const SizedBox(
                         height: 30,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(15),
+                      Padding(
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
-                          decoration: InputDecoration(
+                          keyboardType: TextInputType.phone,
+                          onChanged: (value) {
+                            phone = value;
+                          },
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            labelText: 'User Name',
+                            labelText: 'Phone Number',
                           ),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(15),
+                      Padding(
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
+                          onChanged: (value) {
+                            pass = value;
+                          },
                           obscureText: true,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Password',
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Confirm Password',
                           ),
                         ),
                       ),
@@ -99,7 +102,20 @@ class _SignupState extends State<Signup> {
                                 BorderRadius.all(Radius.circular(15.0)),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          await FirebaseAuth.instance.verifyPhoneNumber(
+                            phoneNumber: '+84 903137194',
+                            verificationCompleted:
+                                (PhoneAuthCredential credential) {},
+                            verificationFailed: (FirebaseAuthException e) {},
+                            codeSent:
+                                (String verificationId, int? resendToken) {
+                              Navigator.pushNamed(context, 'pin');
+                            },
+                            codeAutoRetrievalTimeout:
+                                (String verificationId) {},
+                          );
+                        },
                         child: const Text(
                           'Sign Up',
                           style: TextStyle(
@@ -112,10 +128,7 @@ class _SignupState extends State<Signup> {
                           const Text("Already have an account?"),
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const Login()));
+                              Navigator.pushNamed(context, 'signup');
                             },
                             child: const Text(
                               " Sign In",

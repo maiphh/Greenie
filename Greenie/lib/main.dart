@@ -5,8 +5,15 @@ import 'Welcome.dart';
 import 'Login&Signup.dart';
 import 'user.dart';
 import 'gpShop.dart';
+import 'package:bitcointicker/Login&Signup.dart';
+import 'Signup.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'verify.dart';
+import 'phone.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -21,7 +28,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const GpShop(),
+      initialRoute: 'welcome',
+      routes: {
+        'welcome': (context) => const Welcome(),
+        'auth': (context) => const LS(),
+        'login': (context) => const MyPhone(),
+        'signup': (context) => const Signup(),
+        'shop': (context) => const GpShop(),
+        'profile': (context) => const User(),
+        'pin': (context) => const MyVerify(),
+      },
     );
   }
 }

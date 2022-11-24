@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "789378223490",
+    "project_id": "greenieverse",
+    "storage_bucket": "greenieverse.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789378223490:android:1beca8ff6db3325f59d39b",
+        "android_client_info": {
+          "package_name": "com.example.bitcointicker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "789378223490-en7tvnkfrkhnv3l75nb7525jc7strka0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS98SpI8EYQYbKqIBMROhtXjYAt1RqGfQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "789378223490-en7tvnkfrkhnv3l75nb7525jc7strka0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

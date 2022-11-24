@@ -36,8 +36,7 @@ class LS extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Login()));
+              Navigator.pushNamed(context, 'login');
             },
             child: const Text(
               'Sign In',
@@ -58,8 +57,7 @@ class LS extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Signup()));
+              Navigator.pushNamed(context, 'signup');
             },
             child: const Text(
               'Create Account',

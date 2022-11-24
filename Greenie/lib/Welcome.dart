@@ -24,8 +24,7 @@ class Welcome extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const LS()));
+            Navigator.pushNamed(context, 'login');
           },
           child: const Text(
             'Start Saving',
