@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +37,21 @@ class _MyPhoneState extends State<MyPhone> {
 
       // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, 'profile');
-    } catch (e) {
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      String title = "";
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          title = 'This account exist with a different sign in provider!';
+          break;
+        case 'invalid-credential':
+          title = "Unknown error has occurred";
+          break;
+      }
+      print(title);
+    } finally {
+      setState(() {
+        login = false;
+      });
     }
   }
 
@@ -70,8 +85,57 @@ class _MyPhoneState extends State<MyPhone> {
 
       // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, 'profile');
-    } catch (e) {
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      String title = "";
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          title = 'This account exist with a different sign in provider!';
+          break;
+        case 'invalid-credential':
+          title = "Unknown error has occurred";
+          break;
+      }
+      print(title);
+    }
+  }
+
+  void _loginwithphone(phone) async {
+    setState(() {
+      login = true;
+    });
+
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: countryController.text + phone,
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException e) {},
+        codeSent: (String verificationId, int? resendToken) {
+          MyPhone.verify = verificationId;
+          Navigator.pushNamed(context, 'pin');
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } on FirebaseAuthException catch (e) {
+      String title = "";
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          title = 'This account exist with a different sign in provider!';
+          break;
+        case 'invalid-credential':
+          title = "Unknown error has occurred";
+          break;
+        case 'invalid-verification-code':
+          title = "The verification code of the credential is not valid";
+          break;
+        case 'invalid-verification-id':
+          title = "The verification id of the credential is not valid.id";
+          break;
+      }
+      print(title);
+    } finally {
+      setState(() {
+        login = false;
+      });
     }
   }
 
@@ -173,17 +237,7 @@ class _MyPhoneState extends State<MyPhone> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
                     onPressed: () async {
-                      await FirebaseAuth.instance.verifyPhoneNumber(
-                        phoneNumber: countryController.text + phone,
-                        verificationCompleted:
-                            (PhoneAuthCredential credential) {},
-                        verificationFailed: (FirebaseAuthException e) {},
-                        codeSent: (String verificationId, int? resendToken) {
-                          MyPhone.verify = verificationId;
-                          Navigator.pushNamed(context, 'pin');
-                        },
-                        codeAutoRetrievalTimeout: (String verificationId) {},
-                      );
+                      _loginwithphone(phone);
                     },
                     child: const Text("Send the code")),
               ),

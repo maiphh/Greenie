@@ -1,6 +1,8 @@
 import 'package:bitcointicker/phone.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
 
 class MyVerify extends StatefulWidget {
@@ -120,8 +122,30 @@ class _MyVerifyState extends State<MyVerify> {
                         // ignore: use_build_context_synchronously
                         Navigator.pushNamedAndRemoveUntil(
                             context, 'profile', (route) => false);
-                      } catch (e) {
-                        print(e);
+                      } on FirebaseAuthException catch (e) {
+                        String title = "";
+                        if (e.message!.contains(
+                            'The sms verification code used to create the phone auth credential is invalid')) {
+                          title = "Wrong Pin. Please try again!";
+                        } else if (e.message!
+                            .contains('The sms code has expired')) {
+                          title = "Pin expired. Please try again!";
+                        }
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Verification Error!"),
+                            content: Text(title),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("OK"),
+                              )
+                            ],
+                          ),
+                        );
                       }
                     },
                     child: const Text("Verify Phone Number")),
