@@ -1,9 +1,11 @@
 import 'package:bitcointicker/phone.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
+import 'user.dart';
 
 class MyVerify extends StatefulWidget {
   const MyVerify({Key? key}) : super(key: key);
@@ -119,9 +121,46 @@ class _MyVerifyState extends State<MyVerify> {
 
                         // Sign the user in (or link) with the credential
                         await auth.signInWithCredential(credential);
+
+                        final User? user = auth.currentUser;
+                        final uid = user?.uid;
+                        final usersRef = FirebaseFirestore.instance
+                            .collection('userProfile')
+                            .doc(uid);
+
+                        usersRef.get().then((docSnapshot) async => {
+                              if (!docSnapshot.exists)
+                                {
+                                  await FirebaseFirestore.instance
+                                      .collection('userProfile')
+                                      .doc(uid)
+                                      .set({
+                                    'avatar':
+                                        "https://www.plant-for-the-planet.org/wp-content/uploads/2022/06/team-hs-placeholder.jpg",
+                                    'name': "User",
+                                    'GP': 0,
+                                    'usercode': uid,
+                                  })
+                                }
+                            });
+
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                        );
                         // ignore: use_build_context_synchronously
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, 'profile', (route) => false);
+                        Future.delayed(const Duration(milliseconds: 1000), () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserProfile(uid: uid.toString()),
+                              ));
+                        });
                       } on FirebaseAuthException catch (e) {
                         String title = "";
                         if (e.message!.contains(

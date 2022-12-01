@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
         'shop': (context) => const GpShop(),
-        'profile': (context) => const User(),
         'pin': (context) => const MyVerify(),
       },
     );

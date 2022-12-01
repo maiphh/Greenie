@@ -1,7 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'editProfile.dart';
 
-class User extends StatelessWidget {
-  const User({super.key});
+class UserProfile extends StatefulWidget {
+  final String uid;
+
+  const UserProfile({super.key, required this.uid});
+
+  @override
+  // ignore: no_logic_in_create_state
+  State<UserProfile> createState() => _UserProfileState(uid);
+}
+
+class _UserProfileState extends State<UserProfile> {
+  String uid;
+
+  _UserProfileState(this.uid);
+
+  late dynamic data;
+
+  Future getData() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    final docRef = db.collection("userProfile").doc(uid);
+    await docRef.get().then(
+      (DocumentSnapshot doc) {
+        data = doc.data() as Map<String, dynamic>;
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +88,22 @@ class User extends StatelessWidget {
                                     const SizedBox(
                                       height: 80,
                                     ),
-                                    const Text(
-                                      'User',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: 'Worksans',
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                    FutureBuilder(
+                                        future: getData(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.done) {
+                                            return Text(
+                                              data['name'],
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'Worksans',
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.bold),
+                                            );
+                                          }
+                                          return const Text("loading...");
+                                        }),
                                     const SizedBox(
                                       height: 5,
                                     ),
@@ -92,7 +127,14 @@ class User extends StatelessWidget {
                                               Radius.circular(15.0)),
                                         ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditProfile(uid: uid),
+                                            ));
+                                      },
                                       child: const Text(
                                         'Edit Profile',
                                         style: TextStyle(
@@ -114,15 +156,21 @@ class User extends StatelessWidget {
                               left: 0,
                               right: 0,
                               child: Center(
-                                child: Container(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(90.0),
-                                    child: Image.asset(
-                                      'lib/assets/4.png',
-                                      width: innerWidth * 0.4,
-                                      fit: BoxFit.fitWidth,
-                                    ),
-                                  ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(90.0),
+                                  child: FutureBuilder(
+                                      future: getData(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return Image.network(
+                                            data['avatar'],
+                                            width: innerWidth * 0.4,
+                                            fit: BoxFit.fitWidth,
+                                          );
+                                        }
+                                        return const Text("loading");
+                                      }),
                                 ),
                               ),
                             ),

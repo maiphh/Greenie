@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_sign_in/google_sign_in.dart';
+import 'user.dart';
 
 class MyPhone extends StatefulWidget {
   const MyPhone({Key? key}) : super(key: key);
@@ -19,6 +18,7 @@ class _MyPhoneState extends State<MyPhone> {
   TextEditingController countryController = TextEditingController();
   bool login = false;
   void _loginwithfacebook() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
     setState(() {
       login = true;
     });
@@ -29,14 +29,40 @@ class _MyPhoneState extends State<MyPhone> {
       final facebookAuthCredential = FacebookAuthProvider.credential(
           facebookLoginResult.accessToken!.token);
       await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-      await FirebaseFirestore.instance.collection('users').add({
-        'email': userData['email'],
-        'imageUrl': userData['picture']['data']['url'],
-        'name': userData['name'],
-      });
+      final User? user = auth.currentUser;
+      final uid = user?.uid;
 
+      final usersRef =
+          FirebaseFirestore.instance.collection('userProfile').doc(uid);
+
+      usersRef.get().then((docSnapshot) async => {
+            if (!docSnapshot.exists)
+              {
+                await usersRef.set({
+                  'email': userData['email'],
+                  'avatar': userData['picture']['data']['url'],
+                  'name': userData['name'],
+                  'GP': 0,
+                  'usercode': uid,
+                })
+              }
+          });
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, 'profile');
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfile(uid: uid.toString()),
+            ));
+      });
     } on FirebaseAuthException catch (e) {
       String title = "";
       switch (e.code) {
@@ -56,6 +82,7 @@ class _MyPhoneState extends State<MyPhone> {
   }
 
   void _loginwithgoogle() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
     setState(() {
       login = true;
     });
@@ -77,14 +104,43 @@ class _MyPhoneState extends State<MyPhone> {
           idToken: googleSignInAuthentication.idToken);
 
       await FirebaseAuth.instance.signInWithCredential(credential);
-      await FirebaseFirestore.instance.collection('users').add({
-        'email': googleSignInAccount.email,
-        'imageUrl': googleSignInAccount.photoUrl,
-        'name': googleSignInAccount.displayName,
-      });
+
+      final User? user = auth.currentUser;
+      final uid = user?.uid;
+
+      final usersRef =
+          FirebaseFirestore.instance.collection('userProfile').doc(uid);
+
+      usersRef.get().then((docSnapshot) async => {
+            if (!docSnapshot.exists)
+              {
+                usersRef.set({
+                  'email': googleSignInAccount.email,
+                  'avatar': googleSignInAccount.photoUrl,
+                  'name': googleSignInAccount.displayName,
+                  'GP': 0,
+                  'usercode': uid,
+                })
+              }
+          });
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
 
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, 'profile');
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfile(uid: uid.toString()),
+            ));
+      });
     } on FirebaseAuthException catch (e) {
       String title = "";
       switch (e.code) {
@@ -105,6 +161,14 @@ class _MyPhoneState extends State<MyPhone> {
     });
 
     try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: countryController.text + phone,
         verificationCompleted: (PhoneAuthCredential credential) {},
