@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'editProfile.dart';
 
@@ -28,6 +31,16 @@ class _UserProfileState extends State<UserProfile> {
       },
       onError: (e) => print("Error getting document: $e"),
     );
+    // get image link
+    // check if link is default image
+    if (data['avatar'].contains("https://")) return;
+    // if not then convert image ref to image url
+    final storageRef = FirebaseStorage.instance.ref();
+    final ref = await storageRef.child(data['avatar']);
+    await ref.putFile(File(data['avatar']));
+    final url = await ref.getDownloadURL();
+    data['avatar'] = url;
+    print(url);
   }
 
   @override
@@ -163,9 +176,18 @@ class _UserProfileState extends State<UserProfile> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.done) {
+                                          // return CircleAvatar(
+                                          //   radius: 10,
+                                          //   child: ClipOval(
+                                          //     child: Image.network(
+                                          //       data['avatar']
+                                          //     ),
+                                          //   )
+                                          // );
                                           return Image.network(
                                             data['avatar'],
                                             width: innerWidth * 0.4,
+                                            height: innerHeight * 0.4,
                                             fit: BoxFit.fitWidth,
                                           );
                                         }
