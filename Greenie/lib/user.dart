@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'editProfile.dart';
+import 'phone.dart';
 
 class UserProfile extends StatefulWidget {
   final String uid;
@@ -30,6 +34,16 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
+  Future logout() async {
+    await FirebaseAuth.instance.signOut().then(
+          (value) => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const MyPhone(),
+            ),
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -56,12 +70,6 @@ class _UserProfileState extends State<UserProfile> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const SizedBox(
-                    height: 22,
                   ),
                   SizedBox(
                     height: height * 0.43,
@@ -230,7 +238,26 @@ class _UserProfileState extends State<UserProfile> {
                         ],
                       ),
                     ),
-                  )
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    height: 40,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.red,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10))),
+                        onPressed: () {
+                          logout();
+                        },
+                        child: const Text(
+                          "Log out",
+                          style: TextStyle(fontSize: 20),
+                        )),
+                  ),
                 ],
               ),
             ),

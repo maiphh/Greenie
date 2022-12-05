@@ -38,6 +38,7 @@ dependencies:
   pinput: ^2.2.16
   flutter_facebook_auth: ^5.0.6
   google_sign_in: ^4.5.1
+  qr_flutter: ^4.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -5,6 +5,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_sign_in/google_sign_in.dart';
 import 'user.dart';
+import 'qr.dart';
 
 class MyPhone extends StatefulWidget {
   const MyPhone({Key? key}) : super(key: key);
@@ -138,7 +139,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserProfile(uid: uid.toString()),
+              builder: (context) => Qr(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {
