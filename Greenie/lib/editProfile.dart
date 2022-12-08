@@ -17,7 +17,6 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-
   String uid;
   _EditProfileState(this.uid);
 
@@ -29,22 +28,24 @@ class _EditProfileState extends State<EditProfile> {
     final storageRef = FirebaseStorage.instance.ref();
     final avatarRef = storageRef.child(path);
     try {
-      await avatarRef.putFile(imageTemp, SettableMetadata(
-        contentType: "image/jpeg",
-      ));
-    }
-    on Exception catch (e) {
+      await avatarRef.putFile(
+          imageTemp,
+          SettableMetadata(
+            contentType: "image/jpeg",
+          ));
+    } on Exception catch (e) {
       print("Something wrong");
     }
-
   }
-  Future getImage() async{
+
+  Future getImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(image == null) {
-      print("no image"); 
+    if (image == null) {
+      print("no image");
       return;
-      };
+    }
+    ;
     final path = image.path;
     finalPath = path;
     // final imageTemp = File(image.path);
@@ -60,11 +61,8 @@ class _EditProfileState extends State<EditProfile> {
     // on Exception catch (e) {
     //   print("Something wrong");
     // }
-
-
-    
-
   }
+
   @override
   Widget build(BuildContext context) {
     String username = "";
@@ -110,9 +108,12 @@ class _EditProfileState extends State<EditProfile> {
                     enabledBorder: OutlineInputBorder(),
                   ),
                 ),
-                TextButton(onPressed: (){
-                  getImage();
-                }, child: Text("Upload image"),),
+                TextButton(
+                  onPressed: () {
+                    getImage();
+                  },
+                  child: const Text("Upload image"),
+                ),
                 const Spacer(),
                 SizedBox(
                   width: double.infinity,
@@ -126,12 +127,11 @@ class _EditProfileState extends State<EditProfile> {
                             .collection('userProfile')
                             .doc(uid);
                         uploadImage(finalPath);
-                        if (finalPath == "") finalPath = "https://i.stack.imgur.com/l60Hf.png";
+                        if (finalPath == "")
+                          finalPath = "https://i.stack.imgur.com/l60Hf.png";
                         usersRef.get().then((docSnapshot) async => {
-                              await usersRef.update({
-                                'name': username,
-                                'avatar': finalPath
-                              })
+                              await usersRef.update(
+                                  {'name': username, 'avatar': finalPath})
                             });
                         showDialog(
                           context: context,

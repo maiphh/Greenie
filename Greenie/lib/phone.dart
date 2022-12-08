@@ -1,3 +1,4 @@
+import 'package:bitcointicker/mystery.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'user.dart';
 import 'qr.dart';
+import 'mystery.dart';
 
 class MyPhone extends StatefulWidget {
   const MyPhone({Key? key}) : super(key: key);
@@ -35,16 +37,21 @@ class _MyPhoneState extends State<MyPhone> {
 
       final usersRef =
           FirebaseFirestore.instance.collection('userProfile').doc(uid);
-
+      dynamic inventoryID;
       usersRef.get().then((docSnapshot) async => {
             if (!docSnapshot.exists)
               {
+                await FirebaseFirestore.instance
+                    .collection("gameInventory")
+                    .add({'items': []}).then((documentSnapshot) =>
+                        inventoryID = documentSnapshot.id),
                 await usersRef.set({
                   'email': userData['email'],
                   'avatar': userData['picture']['data']['url'],
                   'name': userData['name'],
                   'GP': 0,
                   'usercode': uid,
+                  'inventoryID': inventoryID,
                 })
               }
           });
@@ -61,7 +68,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserProfile(uid: uid.toString()),
+              builder: (context) => Mystery(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {
@@ -111,16 +118,21 @@ class _MyPhoneState extends State<MyPhone> {
 
       final usersRef =
           FirebaseFirestore.instance.collection('userProfile').doc(uid);
-
+      dynamic inventoryID;
       usersRef.get().then((docSnapshot) async => {
             if (!docSnapshot.exists)
               {
+                await FirebaseFirestore.instance
+                    .collection("gameInventory")
+                    .add({'items': []}).then((documentSnapshot) =>
+                        inventoryID = documentSnapshot.id),
                 usersRef.set({
                   'email': googleSignInAccount.email,
                   'avatar': googleSignInAccount.photoUrl,
                   'name': googleSignInAccount.displayName,
                   'GP': 0,
                   'usercode': uid,
+                  'inventoryID': inventoryID
                 })
               }
           });
@@ -139,7 +151,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Qr(uid: uid.toString()),
+              builder: (context) => Mystery(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {

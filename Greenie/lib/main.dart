@@ -1,3 +1,4 @@
+import 'package:bitcointicker/mystery.dart';
 import 'package:flutter/material.dart';
 import 'Login.dart';
 import 'Signup.dart';
@@ -10,6 +11,8 @@ import 'Signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
+import 'home.dart';
+import 'mystery.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,14 +32,17 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'shop',
+      initialRoute: 'login',
       routes: {
+        'mystery': (context) =>
+            const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
         'welcome': (context) => const Welcome(),
         'auth': (context) => const LS(),
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
         'shop': (context) => const GpShop(),
         'pin': (context) => const MyVerify(),
+        'home': (context) => const Homepage(),
       },
     );
   }
