@@ -127,10 +127,15 @@ class _MyVerifyState extends State<MyVerify> {
                         final usersRef = FirebaseFirestore.instance
                             .collection('userProfile')
                             .doc(uid);
-
+                        dynamic inventoryID;
                         usersRef.get().then((docSnapshot) async => {
                               if (!docSnapshot.exists)
                                 {
+                                  await FirebaseFirestore.instance
+                                      .collection("gameInventory")
+                                      .add({'items': []}).then(
+                                          (documentSnapshot) => inventoryID =
+                                              documentSnapshot.id),
                                   await FirebaseFirestore.instance
                                       .collection('userProfile')
                                       .doc(uid)
@@ -140,6 +145,7 @@ class _MyVerifyState extends State<MyVerify> {
                                     'name': "User",
                                     'GP': 0,
                                     'usercode': uid,
+                                    'inventoryID': inventoryID
                                   })
                                 }
                             });
