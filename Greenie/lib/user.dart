@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'editProfile.dart';
@@ -15,15 +16,30 @@ class UserProfile extends StatefulWidget {
   @override
   // ignore: no_logic_in_create_state
   State<UserProfile> createState() => _UserProfileState(uid);
+  
 }
 
 class _UserProfileState extends State<UserProfile> {
+  
+  // @override
+  // void initState() async {
+  //   // TODO: implement initState
+  //   fcmToken = await FirebaseMessaging.instance.getToken();
+  //   print(fcmToken);
+  //   FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) { 
+  //     // wait for changes
+  //   })
+  //   .onError((err) => {
+  //     print("Something is wrong")
+  //   });
+  // }
   String uid;
 
   _UserProfileState(this.uid);
 
   late dynamic data;
-
+  late dynamic fcmToken;
+  
   Future getData() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     final docRef = db.collection("userProfile").doc(uid);
@@ -42,7 +58,9 @@ class _UserProfileState extends State<UserProfile> {
     await ref.putFile(File(data['avatar']));
     final url = await ref.getDownloadURL();
     data['avatar'] = url;
-    print(url);
+    // Get notification token data["registrationKey"]
+    
+
   }
 
   Future logout() async {
