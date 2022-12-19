@@ -1,6 +1,7 @@
-import 'package:bitcointicker/mystery.dart';
+// import 'package:bitcointicker/mystery.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -35,6 +36,9 @@ class _MyPhoneState extends State<MyPhone> {
       final User? user = auth.currentUser;
       final uid = user?.uid;
 
+      // get firebase messaging token
+      final token = await FirebaseMessaging.instance.getToken();
+
       final usersRef =
           FirebaseFirestore.instance.collection('userProfile').doc(uid);
       dynamic inventoryID;
@@ -52,6 +56,7 @@ class _MyPhoneState extends State<MyPhone> {
                   'GP': 0,
                   'usercode': uid,
                   'inventoryID': inventoryID,
+                  'registrationKey': token
                 })
               }
           });
@@ -68,7 +73,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Mystery(uid: uid.toString()),
+              builder: (context) => UserProfile(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {

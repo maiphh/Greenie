@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -40,7 +41,8 @@ class _EditProfileState extends State<EditProfile> {
 
   Future getImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-
+    // final fcmToken = await FirebaseMessaging.instance.getToken();
+    // print(fcmToken);
     if (image == null) {
       print("no image");
       return;
