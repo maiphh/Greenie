@@ -49,6 +49,7 @@ dependencies:
     firebase_storage: ^11.0.6
     firebase_messaging: ^14.1.4
     flutter_notification_channel: ^2.0.0
+    quickalert: ^1.0.1
 
 dev_dependencies:
     flutter_test:

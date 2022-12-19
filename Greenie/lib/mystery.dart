@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:quickalert/quickalert.dart';
 
 class Mystery extends StatefulWidget {
   final String uid;
@@ -43,15 +44,54 @@ class _MysteryState extends State<Mystery> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     dynamic alert(image, rarity) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: null,
-          content: SizedBox(
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) => AlertDialog(
+      //     title: null,
+      //     content: SizedBox(
+      //       height: height * 0.25,
+      //       width: width * 0.6,
+      //       child: Column(
+      //         children: [
+      //           SizedBox(
+      //               width: width * 0.2,
+      //               child: Image(
+      //                 image: AssetImage(image),
+      //               )),
+      //           const Spacer(),
+      //           Text.rich(
+      //             TextSpan(
+      //                 style: const TextStyle(
+      //                   fontSize: 16,
+      //                   height: 1.5,
+      //                 ),
+      //                 children: [
+      //                   const TextSpan(
+      //                       text: "Congratulations! You just open a "),
+      //                   TextSpan(
+      //                     text: rarity,
+      //                     style: const TextStyle(fontWeight: FontWeight.bold),
+      //                   ),
+      //                   const TextSpan(text: " plant!")
+      //                 ]),
+      //             textAlign: TextAlign.center,
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // );
+
+      QuickAlert.show(
+          context: context,
+          widget: SizedBox(
             height: height * 0.25,
             width: width * 0.6,
             child: Column(
               children: [
+                SizedBox(
+                  height: height * 0.03,
+                ),
                 SizedBox(
                     width: width * 0.2,
                     child: Image(
@@ -65,8 +105,7 @@ class _MysteryState extends State<Mystery> {
                         height: 1.5,
                       ),
                       children: [
-                        const TextSpan(
-                            text: "Congratulations! You just open a "),
+                        const TextSpan(text: "You just opened a "),
                         TextSpan(
                           text: rarity,
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -75,11 +114,17 @@ class _MysteryState extends State<Mystery> {
                       ]),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(
+                  height: height * 0.03,
+                )
               ],
             ),
           ),
-        ),
-      );
+          title: "Congratulation!",
+          titleColor: Colors.green,
+          confirmBtnColor: Colors.green,
+          confirmBtnText: "Add to collection!",
+          type: QuickAlertType.success);
     }
 
     return Scaffold(

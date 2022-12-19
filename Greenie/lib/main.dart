@@ -18,6 +18,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
 import 'home.dart';
+import 'package:quickalert/quickalert.dart';
+
 // import 'mystery.dart';
 // Add Alert to foreground notification
 // https://api.flutter.dev/flutter/material/AlertDialog-class.html
@@ -27,7 +29,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-
 
   // create high notification channel with id 123
   var result = await FlutterNotificationChannel.registerNotificationChannel(
@@ -53,31 +54,35 @@ Future<void> main() async {
   print('User granted permission: ${settings.authorizationStatus}');
 
   // Store token to database
-    FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-    
-    // Getting the token makes everything work as expected
-    await _firebaseMessaging
-        .getToken()
-        .then((String? token) {
-          print(token);
-    });
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {  
-  print('Got a message whilst in the foreground!');
-  print('Message: ${message.data}');
+  // Getting the token makes everything work as expected
+  await _firebaseMessaging.getToken().then((String? token) {
+    print(token);
+  });
 
-  if (message.notification != null   || navigatorKey.currentContext != null) {
-    String body = message.notification!.body!;
-    String title = message.notification!.title!;
-    showDialog(
-          context: navigatorKey.currentContext!, // suggests importing dart.js
-                            // this.context => "invalid reference to 'this' expression" 
-          builder: (_) => AlertDialog(
-                title: Text(title),
-                content: Text(body),
-              ));
-    // print('Message also contained a notification: ${message.notification?.body}');
-  }
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message: ${message.data}');
+
+    if (message.notification != null || navigatorKey.currentContext != null) {
+      String body = message.notification!.body!;
+      String title = message.notification!.title!;
+
+      QuickAlert.show(
+          context: navigatorKey.currentContext!,
+          title: title,
+          text: body,
+          type: QuickAlertType.success);
+      // showDialog(
+      //       context: navigatorKey.currentContext!, // suggests importing dart.js
+      //                         // this.context => "invalid reference to 'this' expression"
+      //       builder: (_) => AlertDialog(
+      //             title: Text(title),
+      //             content: Text(body),
+      //           ));
+      // print('Message also contained a notification: ${message.notification?.body}');
+    }
   });
   runApp(const MyApp());
 }

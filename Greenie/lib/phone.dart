@@ -43,7 +43,6 @@ class _MyPhoneState extends State<MyPhone> {
           FirebaseFirestore.instance.collection('userProfile').doc(uid);
       dynamic inventoryID;
       usersRef.get().then((docSnapshot) async => {
-
             if (!docSnapshot.exists)
               {
                 await FirebaseFirestore.instance
@@ -157,7 +156,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserProfile(uid: uid.toString()),
+              builder: (context) => Mystery(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {
