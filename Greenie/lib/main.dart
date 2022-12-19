@@ -13,6 +13,7 @@ import 'verify.dart';
 import 'phone.dart';
 import 'home.dart';
 import 'mystery.dart';
+import "qrScanner.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,13 +27,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    print("MyApp");
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'login',
+      initialRoute: 'scanner',
       routes: {
         'mystery': (context) =>
             const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
@@ -40,8 +42,9 @@ class MyApp extends StatelessWidget {
         'auth': (context) => const LS(),
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
-        'shop': (context) => const GpShop(),
+        'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
         'pin': (context) => const MyVerify(),
+        'scanner': (context) => const QRScanPage(),
         'home': (context) => const Homepage(),
       },
     );
