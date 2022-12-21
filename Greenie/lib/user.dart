@@ -16,17 +16,15 @@ class UserProfile extends StatefulWidget {
   @override
   // ignore: no_logic_in_create_state
   State<UserProfile> createState() => _UserProfileState(uid);
-  
 }
 
 class _UserProfileState extends State<UserProfile> {
-  
   // @override
   // void initState() async {
   //   // TODO: implement initState
   //   fcmToken = await FirebaseMessaging.instance.getToken();
   //   print(fcmToken);
-  //   FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) { 
+  //   FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
   //     // wait for changes
   //   })
   //   .onError((err) => {
@@ -39,9 +37,22 @@ class _UserProfileState extends State<UserProfile> {
 
   late dynamic data;
   late dynamic fcmToken;
-  
+  dynamic voucherList = [];
+
   Future getData() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
+    dynamic vouchers = [];
+    final CollectionReference voucherRef = db.collection("voucher");
+    await voucherRef
+        .where('user', isEqualTo: uid)
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        vouchers.add(doc.data());
+      });
+    });
+    voucherList = vouchers;
+    print(voucherList);
     final docRef = db.collection("userProfile").doc(uid);
     await docRef.get().then(
       (DocumentSnapshot doc) {
@@ -59,8 +70,6 @@ class _UserProfileState extends State<UserProfile> {
     final url = await ref.getDownloadURL();
     data['avatar'] = url;
     // Get notification token data["registrationKey"]
-    
-
   }
 
   Future logout() async {

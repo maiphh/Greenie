@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'login',
+      initialRoute: 'profile',
       routes: {
         // 'mystery': (context) =>
         //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
@@ -110,6 +110,8 @@ class MyApp extends StatelessWidget {
         'shop': (context) => const GpShop(),
         'pin': (context) => const MyVerify(),
         'home': (context) => const Homepage(),
+        'profile': (context) =>
+            const UserProfile(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
       },
     );
   }
