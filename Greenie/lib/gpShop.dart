@@ -4,10 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:/home.dart';
+import 'package:collection/collection.dart';
+
+void updateGP(int value, String uid) {
+  final docUser = FirebaseFirestore.instance.collection("userProfile").doc(uid);
+
+  docUser.update({'GP': FieldValue.increment(value)});
+}
 
 class GpShop extends StatefulWidget {
-  const GpShop({super.key});
+  final String uid;
+  const GpShop({super.key, required this.uid});
 
   @override
   State<GpShop> createState() => _GpShopState();
@@ -24,45 +31,38 @@ class _GpShopState extends State<GpShop> {
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-              backgroundColor: Colors.green,
-              bottom: const TabBar(tabs: [
-                Tab(
-                  text: "Products",
-                ),
-                Tab(
-                  text: "Vouchers",
-                ),
-              ]),
+              title: Text("foo"),
+              backgroundColor: Colors.white,
+              bottom: const TabBar(
+                  labelColor: Colors.black,
+                  indicatorColor: Colors.green,
+                  tabs: [
+                    Tab(
+                      text: "Products",
+                    ),
+                    Tab(
+                      text: "Vouchers",
+                    ),
+                  ]),
               actions: [
                 IconButton(
                     onPressed: () {
                       showSearch(
                         context: context,
-                        delegate: MySearchDelegate(),
+                        delegate: ProductSearchDelegate(),
                       );
                     },
-                    icon: const Icon(Icons.search))
+                    icon: const Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    ))
               ]),
           body: TabBarView(
             children: [
-              StreamBuilder(
-                  stream: readProducts(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text(
-                          "Something went wrong hahahha${snapshot.error}");
-                    } else if (snapshot.hasData) {
-                      final components = snapshot.data!;
-                      return ListView(
-                          children: components.map((buildItem)).toList());
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }),
-              Text("Vouchers")
-              // TestComponent(),
+              ProductStreamBuilder(
+                uid: widget.uid,
+              ),
+              VoucherStreamBuilder(uid: widget.uid)
             ],
           ),
         ),
@@ -71,24 +71,497 @@ class _GpShopState extends State<GpShop> {
   }
 }
 
-Stream<List<Item>> readProducts() => FirebaseFirestore.instance
+class VoucherStreamBuilder extends StatelessWidget {
+  String uid;
+  VoucherStreamBuilder({super.key, required this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: readVouchers(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text("Something went wrong hahahha${snapshot.error}");
+          } else if (snapshot.hasData) {
+            final components = snapshot.data!;
+            return ListView(
+                children: components
+                    .map((component) => VoucherComponent(
+                          uid: this.uid,
+                          code: component.code,
+                          collaborator: component.collaborator,
+                          description: component.description,
+                          discount: component.discount,
+                          expiryDate: component.expiryDate,
+                          logoPath: component.logoPath,
+                          name: component.name,
+                          price: component.price,
+                          user: component.user,
+                        ))
+                    .toList());
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
+  }
+}
+
+class ProductStreamBuilder extends StatelessWidget {
+  String uid;
+  ProductStreamBuilder({Key? key, required this.uid}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: readProducts(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text("Something went wrong hahahha${snapshot.error}");
+          } else if (snapshot.hasData) {
+            final components = snapshot.data!;
+            return ListView(
+                children: components
+                    .map((component) => ProductComponent(
+                          uid: this.uid,
+                          brand: component.brand,
+                          itemName: component.itemName,
+                          price: component.price,
+                          imageUrl: component.imageUrl,
+                        ))
+                    .toList());
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
+  }
+}
+
+Stream<List<Product>> readProducts() => FirebaseFirestore.instance
     .collection('product')
     .snapshots()
     .map((snapshot) =>
-        snapshot.docs.map((doc) => Item.fromJSON(doc.data())).toList());
-Future<String> readProductImage(String path) =>
-    FirebaseStorage.instance.ref().child(path).getDownloadURL();
+        snapshot.docs.map((doc) => Product.fromJSON(doc.data())).toList());
+Stream<List<Voucher>> readVouchers() => FirebaseFirestore.instance
+    .collection('voucher')
+    .snapshots()
+    .map((snapshot) =>
+        snapshot.docs.map((doc) => Voucher.fromJSON(doc.data())).toList());
 
-Widget buildItem(Item component) {
-  return ItemComponent(
-    brand: component.brand,
-    itemName: component.itemName,
+class Voucher {
+  final String code;
+  final String collaborator;
+  final String description;
+  final double discount;
+  final String expiryDate;
+  final String logoPath;
+  final String name;
+  final int price;
+  final String user;
+  const Voucher(
+      {required this.code,
+      required this.collaborator,
+      required this.description,
+      required this.discount,
+      required this.expiryDate,
+      required this.logoPath,
+      required this.name,
+      required this.price,
+      required this.user});
+  static Voucher fromJSON(Map<String, dynamic> json) {
+    return Voucher(
+        code: json['code'],
+        collaborator: json['collaborator'],
+        description: json['description'],
+        discount: json['discount'],
+        expiryDate: json['expireDate'],
+        logoPath: json['logo'],
+        name: json['name'],
+        price: json['price'],
+        user: json['user']);
+  }
+}
+
+Widget buildVoucher(Voucher component) {
+  return VoucherComponent(
+    uid: '',
+    code: component.code,
+    collaborator: component.collaborator,
+    description: component.description,
+    discount: component.discount,
+    expiryDate: component.expiryDate,
+    logoPath: component.logoPath,
+    name: component.name,
     price: component.price,
-    imageUrl: component.imageUrl,
+    user: component.user,
   );
 }
 
-class MySearchDelegate extends SearchDelegate {
+class VoucherComponent extends StatelessWidget {
+  final String code;
+  final String collaborator;
+  final String description;
+  final double discount;
+  final String expiryDate;
+  String logoPath;
+  final String name;
+  final int price;
+  final String user;
+  String uid;
+  VoucherComponent(
+      {super.key,
+      required this.code,
+      required this.uid,
+      required this.collaborator,
+      required this.description,
+      required this.discount,
+      required this.expiryDate,
+      required this.logoPath,
+      required this.name,
+      required this.price,
+      required this.user});
+
+  getImageUrl() async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final ref = storageRef.child(logoPath);
+    final url = await ref.getDownloadURL();
+    logoPath = url;
+    return logoPath;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width * 0.9;
+    double height = MediaQuery.of(context).size.height * 1 / 9;
+    double borderRad = width * 0.03;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: height * 0.14),
+      child: Align(
+        alignment: Alignment.center,
+        child: ClipShadowPath(
+          shadow: const BoxShadow(
+              color: Color.fromARGB(255, 109, 109, 109),
+              offset: Offset(3, 1.8),
+              spreadRadius: 10,
+              blurRadius: 10,
+              blurStyle: BlurStyle.inner),
+          clipper: ComponentClipper(),
+          child: GestureDetector(
+            onTap: () => {print("Tapped")},
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(borderRad))),
+              width: width,
+              // height: height,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: width * 0.015),
+                child: Row(
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                        child: FutureBuilder(
+                          future: getImageUrl(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return Image(
+                                  height: height,
+                                  width: width * 0.2,
+                                  image: NetworkImage(this.logoPath));
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
+                        )),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          this.collaborator,
+                          style: TextStyle(
+                              color: const Color(0xff37734D),
+                              fontWeight: FontWeight.bold,
+                              fontSize: width * 0.05),
+                        ),
+                        // Text(
+                        //   this.name,
+                        //   style: TextStyle(
+                        //       color: Colors.black54,
+                        //       fontWeight: FontWeight.bold,
+                        //       fontSize: width * 0.04),
+                        // ),
+                        Text(
+                          "Discount: ${(this.discount * 100).toInt()}%",
+                          style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                              fontSize: width * 0.04),
+                        ),
+                        Text(
+                          "Price: " + "${this.price}" + " GP",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.normal,
+                              fontSize: width * 0.04),
+                        )
+                      ],
+                    ),
+                    new Spacer(),
+                    Container(
+                      width: width * 0.17,
+                      height: height,
+                      child: TextButton(
+                        onPressed: () {
+                          print("buttontapped");
+
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        const Spacer(),
+                                        const Center(
+                                            child:
+                                                Text("Purchase confirmation")),
+                                        new Spacer(),
+                                      ],
+                                    ),
+                                    content: Container(
+                                      height: height * 1.9,
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: width * 0.05),
+                                            child: const Text(
+                                                "Are you sure you want to buy this item?"),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: width * 0.05),
+                                                  child: Image(
+                                                      width: width * 0.2,
+                                                      image: NetworkImage(
+                                                          this.logoPath))),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    this.collaborator,
+                                                    style: TextStyle(
+                                                        color: const Color(
+                                                            0xff37734D),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: width * 0.05),
+                                                  ),
+                                                  Text(
+                                                    "Discount: ${(this.discount * 100).toInt()}%",
+                                                    style: TextStyle(
+                                                        color: Colors.black54,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: width * 0.04),
+                                                  ),
+                                                  Text(
+                                                    "Price: " +
+                                                        "${this.price}" +
+                                                        " GP",
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: width * 0.04),
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () => {
+                                                Navigator.pop(context),
+                                              },
+                                          child: const Text("Cancel")),
+                                      TextButton(
+                                          onPressed: () => {
+                                                Navigator.pop(context),
+                                                updateGP(-this.price, this.uid)
+                                              },
+                                          child: const Text("Buy")),
+                                    ],
+                                  ));
+                        },
+                        child: const Text("Buy"),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CircleTabIndicator extends Decoration {
+  final Color color;
+  double radius;
+
+  CircleTabIndicator({required this.color, required this.radius});
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
+    return _CirclePainter(color: color, radius: radius);
+  }
+}
+
+class _CirclePainter extends BoxPainter {
+  final double radius;
+  late Color color;
+  _CirclePainter({required this.color, required this.radius});
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
+    late Paint _paint;
+    _paint = Paint()..color = color;
+    _paint = _paint..isAntiAlias = true;
+    final Offset circleOffset =
+        offset + Offset(cfg.size!.width / 2, cfg.size!.height - radius);
+    canvas.drawCircle(circleOffset, radius, _paint);
+  }
+}
+
+typedef ProductFilterCallBack = List<Product> Function(List<Product>);
+typedef VoucherFilterCallBack = List<Voucher> Function(List<Voucher>);
+
+class Suggestions extends StatefulWidget {
+  String uid;
+  ProductFilterCallBack? productFilterCallback;
+  VoucherFilterCallBack? voucherFilterCallback;
+  Suggestions(
+      {super.key,
+      this.productFilterCallback,
+      this.voucherFilterCallback,
+      required this.uid});
+
+  @override
+  State<Suggestions> createState() => _SuggestionsState();
+}
+
+class _SuggestionsState extends State<Suggestions>
+    with
+        TickerProviderStateMixin<Suggestions>,
+        AutomaticKeepAliveClientMixin<Suggestions> {
+  @override
+  Widget build(BuildContext context) {
+    TabController tabController = TabController(length: 2, vsync: this);
+
+    return Column(
+      children: [
+        Container(
+            child: TabBar(
+                // isScrollable: true,
+                indicator: CircleTabIndicator(color: Colors.green, radius: 4),
+                controller: tabController,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                tabs: const [
+              Tab(
+                text: "Products",
+              ),
+              Tab(
+                text: "Vouchers",
+              ),
+            ])),
+        Flexible(
+          child: TabBarView(controller: tabController, children: [
+            StreamBuilder(
+                stream: readProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text(
+                        "Something went wrong hahahha${snapshot.error}");
+                  } else if (snapshot.hasData) {
+                    var components = snapshot.data!;
+                    if (widget.productFilterCallback != null) {
+                      components = widget.productFilterCallback!(components);
+                    }
+                    return ListView(
+                        children: components
+                            .map((component) => ProductComponent(
+                                  uid: widget.uid,
+                                  brand: component.brand,
+                                  itemName: component.itemName,
+                                  price: component.price,
+                                  imageUrl: component.imageUrl,
+                                ))
+                            .toList());
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+            StreamBuilder(
+                stream: readVouchers(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text(
+                        "Something went wrong hahahha${snapshot.error}");
+                  } else if (snapshot.hasData) {
+                    var components = snapshot.data!;
+                    if (widget.voucherFilterCallback != null) {
+                      components = widget.voucherFilterCallback!(components);
+                    }
+                    return ListView(
+                        children: components
+                            .map((component) => VoucherComponent(
+                                  uid: widget.uid,
+                                  code: component.code,
+                                  collaborator: component.collaborator,
+                                  description: component.description,
+                                  discount: component.discount,
+                                  expiryDate: component.expiryDate,
+                                  logoPath: component.logoPath,
+                                  name: component.name,
+                                  price: component.price,
+                                  user: component.user,
+                                ))
+                            .toList());
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                })
+          ]),
+        )
+      ],
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class ProductSearchDelegate extends SearchDelegate {
+  late String uid;
+
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
@@ -115,12 +588,29 @@ class MySearchDelegate extends SearchDelegate {
     ];
   }
 
-  List<Item> filterItems(List<Item> list) {
-    List<Item> curatedList = [];
+  List<Product> filterProducts(List<Product> list) {
+    List<Product> curatedList = [];
     for (var item in list) {
       if (item.brand.toLowerCase().contains(query.toLowerCase()) ||
           item.itemName.toLowerCase().contains(query.toLowerCase()) ||
           item.price.toString().contains(query.toLowerCase())) {
+        curatedList.add(item);
+      }
+    }
+
+    return curatedList;
+  }
+
+  List<Voucher> filterVouchers(List<Voucher> list) {
+    List<Voucher> curatedList = [];
+    for (var item in list) {
+      if (item.name.toLowerCase().contains(query.toLowerCase()) ||
+          item.discount
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          item.price.toString().contains(query.toLowerCase()) ||
+          item.collaborator.toLowerCase().contains(query.toLowerCase())) {
         curatedList.add(item);
       }
     }
@@ -136,9 +626,18 @@ class MySearchDelegate extends SearchDelegate {
           if (snapshot.hasError) {
             return Text("Something went wrong hahahha${snapshot.error}");
           } else if (snapshot.hasData) {
-            final components = snapshot.data!;
-            final curatedList = filterItems(components);
-            return ListView(children: curatedList.map((buildItem)).toList());
+            var components = snapshot.data!;
+            components = filterProducts(components);
+            return ListView(
+                children: components
+                    .map((component) => ProductComponent(
+                          uid: this.uid,
+                          brand: component.brand,
+                          itemName: component.itemName,
+                          price: component.price,
+                          imageUrl: component.imageUrl,
+                        ))
+                    .toList());
           } else {
             return const Center(
               child: CircularProgressIndicator(),
@@ -149,46 +648,40 @@ class MySearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return StreamBuilder(
-        stream: readProducts(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text("Something went wrong hahahha${snapshot.error}");
-          } else if (snapshot.hasData) {
-            final components = snapshot.data!;
-            final curatedList = filterItems(components);
-            return ListView(children: curatedList.map((buildItem)).toList());
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+    return Suggestions(
+      uid: this.uid,
+      productFilterCallback: filterProducts,
+      voucherFilterCallback: filterVouchers,
+    );
   }
 }
 
-class ItemComponent extends StatelessWidget {
+class ProductComponent extends StatelessWidget {
   final String brand;
   final String itemName;
   final int price;
   String imageUrl;
+  String uid;
 
-  ItemComponent(
+  ProductComponent(
       {super.key,
       required this.brand,
       required this.itemName,
       required this.price,
+      required this.uid,
       required this.imageUrl});
-  static ItemComponent fromJSON(Map<String, dynamic> json) => ItemComponent(
+  static ProductComponent fromJSON(Map<String, dynamic> json) =>
+      ProductComponent(
         brand: json['collaborator'],
         itemName: json['description'],
         price: json['price']['cost'],
         imageUrl: json['image'],
+        uid: "",
       );
 
   getImageUrl() async {
     final storageRef = FirebaseStorage.instance.ref();
-    final ref = storageRef.child(this.imageUrl);
+    final ref = storageRef.child(imageUrl);
     final url = await ref.getDownloadURL();
     imageUrl = url;
     return imageUrl;
@@ -199,7 +692,6 @@ class ItemComponent extends StatelessWidget {
     double width = MediaQuery.of(context).size.width * 0.9;
     double height = MediaQuery.of(context).size.height * 1 / 10;
     double borderRad = width * 0.03;
-    // const String assetPath = "lib/assets/bottle green 2.png";
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: height * 0.14),
@@ -282,26 +774,78 @@ class ItemComponent extends StatelessWidget {
                                             child:
                                                 Text("Purchase confirmation")),
                                         new Spacer(),
-                                        Container(
-                                          width: width * 0.08,
-                                          height: width * 0.08,
-                                          child: IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () =>
-                                                {Navigator.pop(context)},
-                                          ),
-                                        )
                                       ],
                                     ),
-                                    content: const Text(
-                                        "Are you sure you want to buy this item?"),
+                                    content: Container(
+                                      height: height * 1.6,
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: width * 0.05),
+                                            child: const Text(
+                                                "Are you sure you want to buy this item?"),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: width * 0.05),
+                                                  child: Image(
+                                                      width: width * 0.2,
+                                                      image: NetworkImage(
+                                                          this.imageUrl))),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    this.brand,
+                                                    style: TextStyle(
+                                                        color: const Color(
+                                                            0xff37734D),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: width * 0.05),
+                                                  ),
+                                                  Text(
+                                                    this.itemName,
+                                                    style: TextStyle(
+                                                        color: Colors.black54,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: width * 0.04),
+                                                  ),
+                                                  Text(
+                                                    "Price: " +
+                                                        "${this.price}" +
+                                                        " GP",
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: width * 0.04),
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                     actions: [
-                                      TextButton.icon(
+                                      TextButton(
                                           onPressed: () => {
                                                 Navigator.pop(context),
                                               },
-                                          icon: const Icon(Icons.abc),
-                                          label: const Text("Label"))
+                                          child: const Text("Cancel")),
+                                      TextButton(
+                                          onPressed: () => {
+                                                Navigator.pop(context),
+                                                updateGP(-this.price, this.uid)
+                                              },
+                                          child: const Text("Buy")),
                                     ],
                                   ));
                         },
@@ -319,18 +863,18 @@ class ItemComponent extends StatelessWidget {
   }
 }
 
-class Item {
+class Product {
   final String brand;
   final String itemName;
   final int price;
   final String imageUrl;
 
-  const Item(
+  const Product(
       {required this.brand,
       required this.itemName,
       required this.price,
       required this.imageUrl});
-  static Item fromJSON(Map<String, dynamic> json) => Item(
+  static Product fromJSON(Map<String, dynamic> json) => Product(
       brand: json['collaborator'],
       itemName: json['category'],
       price: json['price']['cost'],
@@ -340,8 +884,6 @@ class Item {
 class ComponentClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    int roundnessFactor = 50;
-
     Path path = Path();
 
     path.lineTo(0, size.height);

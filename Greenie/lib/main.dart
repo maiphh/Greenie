@@ -18,6 +18,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
 import 'home.dart';
+import 'mystery.dart';
+import "qrScanner.dart";
 import 'package:quickalert/quickalert.dart';
 
 // import 'mystery.dart';
@@ -92,6 +94,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    print("MyApp");
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Flutter Demo',
@@ -99,7 +102,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
+
       initialRoute: 'profile',
+
       routes: {
         // 'mystery': (context) =>
         //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
@@ -107,8 +112,9 @@ class MyApp extends StatelessWidget {
         'auth': (context) => const LS(),
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
-        'shop': (context) => const GpShop(),
+        'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
         'pin': (context) => const MyVerify(),
+        'scanner': (context) => const QRScanPage(),
         'home': (context) => const Homepage(),
         'profile': (context) =>
             const UserProfile(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
