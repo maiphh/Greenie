@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
 import 'package:flutter_notification_channel/notification_importance.dart';
 import 'package:flutter_notification_channel/notification_visibility.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'Login.dart';
 import 'Signup.dart';
 import 'Welcome.dart';
@@ -17,16 +19,9 @@ import 'Signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
-import 'home.dart';
-import 'mystery.dart';
-import "qrScanner.dart";
-import 'package:quickalert/quickalert.dart';
+import 'game.dart';
 
-// import 'mystery.dart';
-// Add Alert to foreground notification
-// https://api.flutter.dev/flutter/material/AlertDialog-class.html
 final navigatorKey = GlobalKey<NavigatorState>();
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -102,7 +97,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'home',
+      initialRoute: 'shop',
       routes: {
         // 'mystery': (context) =>
         //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
@@ -112,8 +107,6 @@ class MyApp extends StatelessWidget {
         'signup': (context) => const Signup(),
         'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
         'pin': (context) => const MyVerify(),
-        'scanner': (context) => const QRScanPage(),
-        'home': (context) => const Homepage(),
       },
     );
   }
