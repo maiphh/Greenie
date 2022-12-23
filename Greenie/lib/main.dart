@@ -10,6 +10,7 @@ import 'Signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
+import 'game.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'shop',
+      initialRoute: 'game',
       routes: {
         'welcome': (context) => const Welcome(),
         'auth': (context) => const LS(),
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         'signup': (context) => const Signup(),
         'shop': (context) => const GpShop(),
         'pin': (context) => const MyVerify(),
+        'game': (context) => const Game(uid: "Nob3zHMJu3nyF9DhTCmL"),
       },
     );
   }
