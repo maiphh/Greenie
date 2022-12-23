@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'editProfile.dart';
@@ -18,14 +19,40 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+  // @override
+  // void initState() async {
+  //   // TODO: implement initState
+  //   fcmToken = await FirebaseMessaging.instance.getToken();
+  //   print(fcmToken);
+  //   FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+  //     // wait for changes
+  //   })
+  //   .onError((err) => {
+  //     print("Something is wrong")
+  //   });
+  // }
   String uid;
 
   _UserProfileState(this.uid);
 
   late dynamic data;
+  late dynamic fcmToken;
+  dynamic voucherList = [];
 
   Future getData() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
+    dynamic vouchers = [];
+    final CollectionReference voucherRef = db.collection("voucher");
+    await voucherRef
+        .where('user', isEqualTo: uid)
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        vouchers.add(doc.data());
+      });
+    });
+    voucherList = vouchers;
+    print(voucherList);
     final docRef = db.collection("userProfile").doc(uid);
     await docRef.get().then(
       (DocumentSnapshot doc) {
@@ -42,7 +69,7 @@ class _UserProfileState extends State<UserProfile> {
     await ref.putFile(File(data['avatar']));
     final url = await ref.getDownloadURL();
     data['avatar'] = url;
-    print(url);
+    // Get notification token data["registrationKey"]
   }
 
   Future logout() async {
