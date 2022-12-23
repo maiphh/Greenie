@@ -102,7 +102,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       // initialRoute: 'login',
-      initialRoute: 'scanner',
+      initialRoute: 'home',
       routes: {
         // 'mystery': (context) =>
         //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
