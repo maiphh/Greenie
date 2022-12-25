@@ -217,11 +217,16 @@ class _UserProfileState extends State<UserProfile> {
                                           //     ),
                                           //   )
                                           // );
-                                          return Image.network(
-                                            data['avatar'],
-                                            width: innerWidth * 0.4,
-                                            height: innerHeight * 0.4,
-                                            fit: BoxFit.fitWidth,
+                                          return ClipOval(
+                                            child: SizedBox.fromSize(
+                                              size:
+                                                  Size.fromRadius(height * 0.1),
+                                              child: Image.network(
+                                                  data['avatar'],
+                                                  width: innerWidth * 0.4,
+                                                  height: innerHeight * 0.4,
+                                                  fit: BoxFit.cover),
+                                            ),
                                           );
                                         }
                                         return const Text("loading");

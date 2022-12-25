@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
       ),
       // initialRoute: 'login',
 
-      initialRoute: 'profile',
+      initialRoute: 'shop',
 
       routes: {
         // 'mystery': (context) =>
