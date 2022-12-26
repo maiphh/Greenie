@@ -29,13 +29,80 @@ class _GameState extends State<Game> {
   String uid;
   _GameState(this.uid);
 
+  int commonCount = 0;
+  int epicCount = 0;
+  int legendaryCount = 0;
+  int mythicalCount = 0;
+  int rareCount = 0;
+  List<String> itemImages = <String>[];
+  void countTrees(List<dynamic> items) {
+    for (int i = 0; i < items.length; i++) {
+      if (items[i] == "common") {
+        itemImages.add("lib/assets/common.png");
+
+        commonCount++;
+      }
+      if (items[i] == "epic") {
+        itemImages.add("lib/assets/epic.png");
+        epicCount++;
+      }
+      if (items[i] == "legendary") {
+        itemImages.add("lib/assets/legend.png");
+        legendaryCount++;
+      }
+      if (items[i] == "mythical") {
+        itemImages.add("lib/assets/mythic.png");
+        mythicalCount++;
+      }
+      if (items[i] == "rare") {
+        itemImages.add("lib/assets/rare.png");
+        rareCount++;
+      }
+    }
+    print("common count is : ${commonCount}");
+  }
+
   @override
   Widget build(BuildContext context) {
     uidGlobal = uid;
+    final Stream<DocumentSnapshot> items = FirebaseFirestore.instance
+        .collection('gameInventory')
+        .doc(uidGlobal)
+        .snapshots();
+
     BorderRadiusGeometry radius = const BorderRadius.only(
       topLeft: Radius.circular(24.0),
       topRight: Radius.circular(24.0),
     );
+
+    Map<String, dynamic> toCount() {
+      print("toCount commonCount is: ${commonCount}");
+      return {
+        'common': commonCount,
+        'epic': epicCount,
+        'legendary': legendaryCount,
+        'mythical': mythicalCount,
+        'rare': rareCount
+      };
+    }
+
+    Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
+        .collection('gameItem')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => GameItem.fromJson({...doc.data(), ...toCount()}))
+            .toList());
+    Widget buildImageItem(GameItem gameItem) => GridTile(
+          // ignore: prefer_const_constructors
+          // gridDelegate:
+          //     SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          // itemBuilder: (context, index) =>
+          child: Image(image: Image.network(gameItem.image).image),
+        );
+
+    Widget buildGameItem(GameItem gameItem) => Foo(
+          gameItem: gameItem,
+        );
     return Scaffold(
       appBar: AppBar(
         leading:
@@ -68,7 +135,10 @@ class _GameState extends State<Game> {
                     final GameItem = snapshot.data!;
 
                     return ListView(
-                      children: GameItem.map(buildGameItem).toList(),
+                      // children: GameItem.map(buildGameItem).toList(),
+                      children:
+                          GameItem.map((gameItem) => Foo(gameItem: gameItem))
+                              .toList(),
                     );
 
                     // GameItem.map(buildGameItem).toList();
@@ -108,7 +178,11 @@ class _GameState extends State<Game> {
                               image: AssetImage('lib/assets/planet1.png'),
                               fit: BoxFit.cover)),
                     )),
-                const TreeGrid()
+                displayGameInventory(
+                  items: items,
+                  itemImages: itemImages,
+                  countTrees: countTrees,
+                ),
               ],
             ),
           ),
@@ -172,7 +246,8 @@ class TreeGrid extends StatefulWidget {
 class _TreeGridState extends State<TreeGrid> {
   @override
   Widget build(BuildContext context) {
-    return displayGameInventory();
+    return Container();
+    // return displayGameInventory();
   }
 }
 
@@ -196,21 +271,20 @@ class OptionButton extends StatelessWidget {
   }
 }
 
-final Stream<DocumentSnapshot> items = FirebaseFirestore.instance
-    .collection('gameInventory')
-    .doc(uidGlobal)
-    .snapshots();
+typedef countTreesCallback = Function(List<dynamic>);
 
-int commonCount = 1;
-int epicCount = 2;
-int legendaryCount = 3;
-int mythicalCount = 4;
-int rareCount = 5;
 class displayGameInventory extends StatelessWidget {
+  late Stream<DocumentSnapshot> items;
+  List<String> itemImages;
+  countTreesCallback countTrees;
+  displayGameInventory(
+      {super.key,
+      required this.items,
+      required this.itemImages,
+      required this.countTrees});
+
   @override
   Widget build(BuildContext context) {
-    List<String> itemImages = <String>[];
-
     return StreamBuilder<DocumentSnapshot>(
       stream: items,
       builder:
@@ -218,36 +292,14 @@ class displayGameInventory extends StatelessWidget {
         if (!snapshot.hasData) {
           return Text("Something has gone wrong: $snapshot.error");
         }
-        ;
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text("Loading");
         }
         final data = snapshot.requireData;
 
         List<dynamic> items = data['items'];
-
-        for (int i = 0; i < items.length; i++) {
-          if (items[i] == "common") {
-            itemImages.add("lib/assets/common.png");
-            commonCount++;
-          }
-          if (items[i] == "epic") {
-            itemImages.add("lib/assets/epic.png");
-            epicCount++;
-          }
-          if (items[i] == "legendary") {
-            itemImages.add("lib/assets/legend.png");
-            legendaryCount++;
-          }
-          if (items[i] == "mythical") {
-            itemImages.add("lib/assets/mythical.png");
-            mythicalCount++;
-          }
-          if (items[i] == "rare") {
-            itemImages.add("lib/assets/rare.png");
-            rareCount++;
-          }
-        }
+        countTrees(items);
 
         return GridView.builder(
             gridDelegate:
@@ -263,14 +315,6 @@ class displayGameInventory extends StatelessWidget {
     );
   }
 }
-
-Map<String, dynamic> toCount() => {
-      'common': commonCount,
-      'epic': epicCount,
-      'legendary': legendaryCount,
-      'mythical': mythicalCount,
-      'rare': rareCount
-    };
 
 // ignore: empty_constructor_bodies
 class GameItem {
@@ -295,15 +339,6 @@ class GameItem {
       count: json[json['name']]);
 }
 
-Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
-    .collection('gameItem')
-    .snapshots()
-    .map((snapshot) => snapshot.docs
-        .map((doc) => GameItem.fromJson({...doc.data(), ...toCount()}))
-        .toList());
-
-Widget buildGameItem(GameItem gameItem) => Foo(gameItem: gameItem,);
-
 class Foo extends StatefulWidget {
   GameItem gameItem;
   Foo({Key? key, required this.gameItem}) : super(key: key);
@@ -314,20 +349,14 @@ class Foo extends StatefulWidget {
 class _FooState extends State<Foo> {
   @override
   Widget build(BuildContext context) {
+    print("This is foo");
     return ListTile(
       leading: CircleAvatar(
-          backgroundColor: Colors.white, child: Image.network(widget.gameItem.image)),
+          backgroundColor: Colors.white,
+          child: Image.network(widget.gameItem.image)),
       title: Text(widget.gameItem.name),
       subtitle: Text("Rarity: ${widget.gameItem.reward}"),
       trailing: Text(widget.gameItem.count.toString()),
     );
   }
 }
-
-Widget buildImageItem(GameItem gameItem) => GridTile(
-      // ignore: prefer_const_constructors
-      // gridDelegate:
-      //     SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      // itemBuilder: (context, index) =>
-      child: Image(image: Image.network(gameItem.image).image),
-    );
