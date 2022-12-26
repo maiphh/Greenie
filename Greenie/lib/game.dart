@@ -339,6 +339,17 @@ class GameItem {
       count: json[json['name']]);
 }
 
+Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
+    .collection('gameItem')
+    .snapshots()
+    .map((snapshot) => snapshot.docs
+        .map((doc) => GameItem.fromJson({...doc.data(), ...toCount()}))
+        .toList());
+
+Widget buildGameItem(GameItem gameItem) => Foo(
+      gameItem: gameItem,
+    );
+
 class Foo extends StatefulWidget {
   GameItem gameItem;
   Foo({Key? key, required this.gameItem}) : super(key: key);
