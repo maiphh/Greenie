@@ -70,10 +70,44 @@ class _GameState extends State<Game> {
   Widget build(BuildContext context) {
     
     uidGlobal = uid;
+    final Stream<DocumentSnapshot> items = FirebaseFirestore.instance
+        .collection('gameInventory')
+        .doc(uidGlobal)
+        .snapshots();
+
     BorderRadiusGeometry radius = const BorderRadius.only(
       topLeft: Radius.circular(24.0),
       topRight: Radius.circular(24.0),
     );
+
+    Map<String, dynamic> toCount() {
+      print("toCount commonCount is: ${commonCount}");
+      return {
+        'common': commonCount,
+        'epic': epicCount,
+        'legendary': legendaryCount,
+        'mythical': mythicalCount,
+        'rare': rareCount
+      };
+    }
+
+    Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
+        .collection('gameItem')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => GameItem.fromJson({...doc.data(), ...toCount()}))
+            .toList());
+    Widget buildImageItem(GameItem gameItem) => GridTile(
+          // ignore: prefer_const_constructors
+          // gridDelegate:
+          //     SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          // itemBuilder: (context, index) =>
+          child: Image(image: Image.network(gameItem.image).image),
+        );
+
+    Widget buildGameItem(GameItem gameItem) => Foo(
+          gameItem: gameItem,
+        );
     return Scaffold(
       appBar: AppBar(
         leading:
@@ -208,7 +242,11 @@ class _GameState extends State<Game> {
                               image: AssetImage('lib/assets/planet1.png'),
                               fit: BoxFit.cover)),
                     )),
-                const TreeGrid()
+                displayGameInventory(
+                  items: items,
+                  itemImages: itemImages,
+                  countTrees: countTrees,
+                ),
               ],
             ),
           ),
@@ -272,7 +310,8 @@ class TreeGrid extends StatefulWidget {
 class _TreeGridState extends State<TreeGrid> {
   @override
   Widget build(BuildContext context) {
-    return displayGameInventory();
+    return Container();
+    // return displayGameInventory();
   }
 }
 
@@ -375,14 +414,6 @@ class displayGameInventory extends StatelessWidget {
   }
 }
 
-Map<String, dynamic> toCount() => {
-      'common': commonCount,
-      'epic': epicCount,
-      'legendary': legendaryCount,
-      'mythical': mythicalCount,
-      'rare': rareCount
-    };
-
 // ignore: empty_constructor_bodies
 class GameItem {
   String image;
@@ -406,15 +437,6 @@ class GameItem {
       count: json[json['name']]);
 }
 
-Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
-    .collection('gameItem')
-    .snapshots()
-    .map((snapshot) => snapshot.docs
-        .map((doc) => GameItem.fromJson({...doc.data(), ...toCount()}))
-        .toList());
-
-Widget buildGameItem(GameItem gameItem) => Foo(gameItem: gameItem,);
-
 class Foo extends StatefulWidget {
   GameItem gameItem;
   Foo({Key? key, required this.gameItem}) : super(key: key);
@@ -425,6 +447,7 @@ class Foo extends StatefulWidget {
 class _FooState extends State<Foo> {
   @override
   Widget build(BuildContext context) {
+    print("This is foo");
     return ListTile(
       leading: CircleAvatar(
           backgroundColor: Colors.white, child: Image.asset(widget.gameItem.image)),
@@ -434,11 +457,3 @@ class _FooState extends State<Foo> {
     );
   }
 }
-
-Widget buildImageItem(GameItem gameItem) => GridTile(
-      // ignore: prefer_const_constructors
-      // gridDelegate:
-      //     SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      // itemBuilder: (context, index) =>
-      child: Image(image: Image.network(gameItem.image).image),
-    );

@@ -98,6 +98,7 @@ class MyApp extends StatelessWidget {
       ),
       // initialRoute: 'login',
       initialRoute: 'game',
+      initialRoute: 'game',
       routes: {
         // 'mystery': (context) =>
         //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
