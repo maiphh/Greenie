@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'user.dart';
 import 'qr.dart';
 import 'mystery.dart';
+import 'home.dart';
 
 class MyPhone extends StatefulWidget {
   const MyPhone({Key? key}) : super(key: key);
@@ -73,7 +74,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserProfile(uid: uid.toString()),
+              builder: (context) => Homepage(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {
@@ -156,7 +157,7 @@ class _MyPhoneState extends State<MyPhone> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Mystery(uid: uid.toString()),
+              builder: (context) => Homepage(uid: uid.toString()),
             ));
       });
     } on FirebaseAuthException catch (e) {

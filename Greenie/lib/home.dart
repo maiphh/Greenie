@@ -1,3 +1,7 @@
+import 'package:bitcointicker/game.dart';
+import 'package:bitcointicker/gpShop.dart';
+import 'package:bitcointicker/qr.dart';
+import 'package:bitcointicker/user.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -26,7 +30,8 @@ List<AssetImage> itemImages = [
 ];
 
 class Homepage extends StatelessWidget {
-  const Homepage({super.key});
+  String uid;
+  Homepage({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +40,7 @@ class Homepage extends StatelessWidget {
       body: Stack(children: const [
         Content(),
       ]),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(uid: this.uid),
     );
   }
 }
@@ -241,6 +246,9 @@ class GreetingAndNotification extends StatelessWidget {
 }
 
 class BottomNavBar extends StatefulWidget {
+  String uid;
+  BottomNavBar({super.key, required this.uid});
+
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
@@ -274,9 +282,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 child: FloatingActionButton(
                     backgroundColor: Colors.lightGreen,
                     elevation: 0.1,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Game(uid: widget.uid),
+                          ));
+                    },
                     child: const ImageIcon(
-                      AssetImage("assets/images/nav_globe.png"),
+                      AssetImage("lib/assets/nav_globe.png"),
                       size: 50,
                       color: Color.fromARGB(255, 33, 103, 36),
                     )),
@@ -296,6 +310,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       ),
                       onPressed: () {
                         setBottomBarIndex(0);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Homepage(uid: widget.uid),
+                            ));
                       },
                       splashColor: Colors.white,
                     ),
@@ -308,6 +327,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         ),
                         onPressed: () {
                           setBottomBarIndex(1);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Qr(uid: widget.uid),
+                              ));
                         }),
                     Container(
                       width: size.width * 0.20,
@@ -321,6 +345,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         ),
                         onPressed: () {
                           setBottomBarIndex(2);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GpShop(uid: widget.uid),
+                              ));
                         }),
                     IconButton(
                         icon: Icon(
@@ -331,6 +360,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         ),
                         onPressed: () {
                           setBottomBarIndex(3);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserProfile(uid: widget.uid),
+                              ));
                         }),
                   ],
                 ),

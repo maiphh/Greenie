@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'home.dart';
 
 class Qr extends StatefulWidget {
   final String uid;
@@ -19,6 +20,7 @@ class _QrState extends State<Qr> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      bottomNavigationBar: BottomNavBar(uid: widget.uid),
       body: Stack(
         alignment: Alignment.center,
         children: [

@@ -5,11 +5,27 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'home.dart';
+import 'package:quickalert/quickalert.dart';
 
-void updateGP(int value, String uid) {
+void updateGP(int value, String uid, BuildContext context) async {
   final docUser = FirebaseFirestore.instance.collection("userProfile").doc(uid);
-
-  docUser.update({'GP': FieldValue.increment(value)});
+  var data = await docUser.get();
+  var wallet = data['GP'];
+  print(wallet);
+  if (value < 0) {
+    if (wallet + value < 0) {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: "Oops...",
+          text: "You don't have enough GP");
+    } else {
+      docUser.update({'GP': FieldValue.increment(value)});
+    }
+  } else {
+    docUser.update({'GP': FieldValue.increment(value)});
+  }
 }
 
 class GpShop extends StatefulWidget {
@@ -25,10 +41,11 @@ class _GpShopState extends State<GpShop> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    return MaterialApp(
-      home: DefaultTabController(
+    return Scaffold(
+      body: DefaultTabController(
         length: 2,
         child: Scaffold(
+          bottomNavigationBar: BottomNavBar(uid: widget.uid),
           backgroundColor: Colors.white,
           appBar: AppBar(
               title: Text("foo"),
@@ -49,7 +66,7 @@ class _GpShopState extends State<GpShop> {
                     onPressed: () {
                       showSearch(
                         context: context,
-                        delegate: ProductSearchDelegate(),
+                        delegate: ProductSearchDelegate(uid: widget.uid),
                       );
                     },
                     icon: const Icon(
@@ -318,91 +335,148 @@ class VoucherComponent extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           print("buttontapped");
-
-                          showDialog(
+                          QuickAlert.show(
+                              onConfirmBtnTap: () {
+                                updateGP(-this.price, uid, context);
+                                Navigator.pop(context);
+                              },
                               context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Row(
+                              type: QuickAlertType.confirm,
+                              title: "Purchase confirmation",
+                              text: "Do you want to buy this product?",
+                              widget: Container(
+                                height: height * 1.9,
+                                child: Column(
+                                  children: [
+                                    Row(
                                       children: [
-                                        const Spacer(),
-                                        const Center(
-                                            child:
-                                                Text("Purchase confirmation")),
-                                        new Spacer(),
+                                        Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: width * 0.05),
+                                            child: Image(
+                                                width: width * 0.2,
+                                                image: NetworkImage(
+                                                    this.logoPath))),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              this.collaborator,
+                                              style: TextStyle(
+                                                  color:
+                                                      const Color(0xff37734D),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: width * 0.05),
+                                            ),
+                                            Text(
+                                              "Discount: ${(this.discount * 100).toInt()}%",
+                                              style: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: width * 0.04),
+                                            ),
+                                            Text(
+                                              "Price: " +
+                                                  "${this.price}" +
+                                                  " GP",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: width * 0.04),
+                                            )
+                                          ],
+                                        )
                                       ],
-                                    ),
-                                    content: Container(
-                                      height: height * 1.9,
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                bottom: width * 0.05),
-                                            child: const Text(
-                                                "Are you sure you want to buy this item?"),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: width * 0.05),
-                                                  child: Image(
-                                                      width: width * 0.2,
-                                                      image: NetworkImage(
-                                                          this.logoPath))),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Text(
-                                                    this.collaborator,
-                                                    style: TextStyle(
-                                                        color: const Color(
-                                                            0xff37734D),
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: width * 0.05),
-                                                  ),
-                                                  Text(
-                                                    "Discount: ${(this.discount * 100).toInt()}%",
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: width * 0.04),
-                                                  ),
-                                                  Text(
-                                                    "Price: " +
-                                                        "${this.price}" +
-                                                        " GP",
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: width * 0.04),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () => {
-                                                Navigator.pop(context),
-                                              },
-                                          child: const Text("Cancel")),
-                                      TextButton(
-                                          onPressed: () => {
-                                                Navigator.pop(context),
-                                                updateGP(-this.price, this.uid)
-                                              },
-                                          child: const Text("Buy")),
-                                    ],
-                                  ));
+                                    )
+                                  ],
+                                ),
+                              ));
+                          // showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //           title: Row(
+                          //             children: [
+                          //               const Spacer(),
+                          //               const Center(
+                          //                   child:
+                          //                       Text("Purchase confirmation")),
+                          //               new Spacer(),
+                          //             ],
+                          //           ),
+                          //           content: Container(
+                          //             height: height * 1.9,
+                          //             child: Column(
+                          //               children: [
+                          //                 Padding(
+                          //                   padding: EdgeInsets.only(
+                          //                       bottom: width * 0.05),
+                          //                   child: const Text(
+                          //                       "Are you sure you want to buy this item?"),
+                          //                 ),
+                          //                 Row(
+                          //                   children: [
+                          //                     Padding(
+                          //                         padding: EdgeInsets.symmetric(
+                          //                             horizontal: width * 0.05),
+                          //                         child: Image(
+                          //                             width: width * 0.2,
+                          //                             image: NetworkImage(
+                          //                                 this.logoPath))),
+                          //                     Column(
+                          //                       mainAxisAlignment:
+                          //                           MainAxisAlignment
+                          //                               .spaceEvenly,
+                          //                       children: [
+                          //                         Text(
+                          //                           this.collaborator,
+                          //                           style: TextStyle(
+                          //                               color: const Color(
+                          //                                   0xff37734D),
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                               fontSize: width * 0.05),
+                          //                         ),
+                          //                         Text(
+                          //                           "Discount: ${(this.discount * 100).toInt()}%",
+                          //                           style: TextStyle(
+                          //                               color: Colors.black54,
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                               fontSize: width * 0.04),
+                          //                         ),
+                          //                         Text(
+                          //                           "Price: " +
+                          //                               "${this.price}" +
+                          //                               " GP",
+                          //                           style: TextStyle(
+                          //                               color: Colors.grey,
+                          //                               fontWeight:
+                          //                                   FontWeight.normal,
+                          //                               fontSize: width * 0.04),
+                          //                         )
+                          //                       ],
+                          //                     )
+                          //                   ],
+                          //                 )
+                          //               ],
+                          //             ),
+                          //           ),
+                          //           actions: [
+                          //             TextButton(
+                          //                 onPressed: () => {
+                          //                       Navigator.pop(context),
+                          //                     },
+                          //                 child: const Text("Cancel")),
+                          //             TextButton(
+                          //                 onPressed: () => {
+                          //                       Navigator.pop(context),
+                          //                       updateGP(-this.price, this.uid,
+                          //                           context)
+                          //                     },
+                          //                 child: const Text("Buy")),
+                          //           ],
+                          //         ));
                         },
                         child: const Text("Buy"),
                       ),
@@ -560,7 +634,8 @@ class _SuggestionsState extends State<Suggestions>
 }
 
 class ProductSearchDelegate extends SearchDelegate {
-  late String uid;
+  String uid;
+  ProductSearchDelegate({required this.uid});
 
   @override
   Widget? buildLeading(BuildContext context) {
@@ -763,91 +838,149 @@ class ProductComponent extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           print("buttontapped");
-
-                          showDialog(
+                          QuickAlert.show(
+                              onConfirmBtnTap: () {
+                                updateGP(-this.price, uid, context);
+                                // Navigator.pop();
+                              },
                               context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Row(
+                              type: QuickAlertType.confirm,
+                              title: "Purchase confirmation",
+                              text: "Do you want to buy this product?",
+                              widget: Container(
+                                height: height * 1.6,
+                                child: Column(
+                                  children: [
+                                    Row(
                                       children: [
-                                        const Spacer(),
-                                        const Center(
-                                            child:
-                                                Text("Purchase confirmation")),
-                                        new Spacer(),
+                                        Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: width * 0.05),
+                                            child: Image(
+                                                width: width * 0.2,
+                                                image: NetworkImage(
+                                                    this.imageUrl))),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              this.brand,
+                                              style: TextStyle(
+                                                  color:
+                                                      const Color(0xff37734D),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: width * 0.05),
+                                            ),
+                                            Text(
+                                              this.itemName,
+                                              style: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: width * 0.04),
+                                            ),
+                                            Text(
+                                              "Price: " +
+                                                  "${this.price}" +
+                                                  " GP",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: width * 0.04),
+                                            )
+                                          ],
+                                        )
                                       ],
-                                    ),
-                                    content: Container(
-                                      height: height * 1.6,
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                bottom: width * 0.05),
-                                            child: const Text(
-                                                "Are you sure you want to buy this item?"),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: width * 0.05),
-                                                  child: Image(
-                                                      width: width * 0.2,
-                                                      image: NetworkImage(
-                                                          this.imageUrl))),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Text(
-                                                    this.brand,
-                                                    style: TextStyle(
-                                                        color: const Color(
-                                                            0xff37734D),
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: width * 0.05),
-                                                  ),
-                                                  Text(
-                                                    this.itemName,
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: width * 0.04),
-                                                  ),
-                                                  Text(
-                                                    "Price: " +
-                                                        "${this.price}" +
-                                                        " GP",
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: width * 0.04),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () => {
-                                                Navigator.pop(context),
-                                              },
-                                          child: const Text("Cancel")),
-                                      TextButton(
-                                          onPressed: () => {
-                                                Navigator.pop(context),
-                                                updateGP(-this.price, this.uid)
-                                              },
-                                          child: const Text("Buy")),
-                                    ],
-                                  ));
+                                    )
+                                  ],
+                                ),
+                              ));
+
+                          // showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //           title: Row(
+                          //             children: [
+                          //               const Spacer(),
+                          //               const Center(
+                          //                   child:
+                          //                       Text("Purchase confirmation")),
+                          //               new Spacer(),
+                          //             ],
+                          //           ),
+                          //           content: Container(
+                          //             height: height * 1.6,
+                          //             child: Column(
+                          //               children: [
+                          //                 Padding(
+                          //                   padding: EdgeInsets.only(
+                          //                       bottom: width * 0.05),
+                          //                   child: const Text(
+                          //                       "Are you sure you want to buy this item?"),
+                          //                 ),
+                          //                 Row(
+                          //                   children: [
+                          //                     Padding(
+                          //                         padding: EdgeInsets.symmetric(
+                          //                             horizontal: width * 0.05),
+                          //                         child: Image(
+                          //                             width: width * 0.2,
+                          //                             image: NetworkImage(
+                          //                                 this.imageUrl))),
+                          //                     Column(
+                          //                       mainAxisAlignment:
+                          //                           MainAxisAlignment
+                          //                               .spaceEvenly,
+                          //                       children: [
+                          //                         Text(
+                          //                           this.brand,
+                          //                           style: TextStyle(
+                          //                               color: const Color(
+                          //                                   0xff37734D),
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                               fontSize: width * 0.05),
+                          //                         ),
+                          //                         Text(
+                          //                           this.itemName,
+                          //                           style: TextStyle(
+                          //                               color: Colors.black54,
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                               fontSize: width * 0.04),
+                          //                         ),
+                          //                         Text(
+                          //                           "Price: " +
+                          //                               "${this.price}" +
+                          //                               " GP",
+                          //                           style: TextStyle(
+                          //                               color: Colors.grey,
+                          //                               fontWeight:
+                          //                                   FontWeight.normal,
+                          //                               fontSize: width * 0.04),
+                          //                         )
+                          //                       ],
+                          //                     )
+                          //                   ],
+                          //                 )
+                          //               ],
+                          //             ),
+                          //           ),
+                          //           actions: [
+                          //             TextButton(
+                          //                 onPressed: () => {
+                          //                       Navigator.pop(context),
+                          //                     },
+                          //                 child: const Text("Cancel")),
+                          //             TextButton(
+                          //                 onPressed: () => {
+                          //                       Navigator.pop(context),
+                          //                       updateGP(-this.price, this.uid,
+                          //                           context)
+                          //                     },
+                          //                 child: const Text("Buy")),
+                          //           ],
+                          //         ));
                         },
                         child: const Text("Buy"),
                       ),

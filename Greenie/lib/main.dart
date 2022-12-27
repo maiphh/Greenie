@@ -1,6 +1,7 @@
 // import 'package:bitcointicker/mystery.dart';
 // import 'dart:js';
 
+import 'package:bitcointicker/home.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
@@ -20,6 +21,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'verify.dart';
 import 'phone.dart';
 import 'game.dart';
+import 'mystery.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
@@ -93,22 +95,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
+      theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.green),
       // initialRoute: 'login',
-      initialRoute: 'game',
-      initialRoute: 'game',
+      initialRoute: 'home',
+
       routes: {
-        // 'mystery': (context) =>
-        //     const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
-        'welcome': (context) => const Welcome(),
-        'auth': (context) => const LS(),
+        'mystery': (context) =>
+            const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
+        // 'welcome': (context) => const Welcome(),
+        'home': (context) => Homepage(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
-        'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
+        // 'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
         'pin': (context) => const MyVerify(),
-        'game': (context) => const Game(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
+        // 'game': (context) => const Game(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
       },
     );
   }

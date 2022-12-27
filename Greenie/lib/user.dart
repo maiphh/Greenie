@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'editProfile.dart';
 import 'phone.dart';
+import 'home.dart';
 
 class UserProfile extends StatefulWidget {
   final String uid;
@@ -98,6 +99,7 @@ class _UserProfileState extends State<UserProfile> {
           ),
         ),
         Scaffold(
+          bottomNavigationBar: BottomNavBar(uid: widget.uid),
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),

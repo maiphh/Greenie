@@ -3,6 +3,28 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:quickalert/quickalert.dart';
 
+Future<bool> updateGP(int value, String uid, BuildContext context) async {
+  final docUser = FirebaseFirestore.instance.collection("userProfile").doc(uid);
+  var data = await docUser.get();
+  var wallet = data['GP'];
+  print(wallet);
+  if (value < 0) {
+    if (wallet + value < 0) {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: "Oops...",
+          text: "You don't have enough GP");
+      return false;
+    } else {
+      docUser.update({'GP': FieldValue.increment(value)});
+    }
+  } else {
+    docUser.update({'GP': FieldValue.increment(value)});
+  }
+  return true;
+}
+
 class Mystery extends StatefulWidget {
   final String uid;
   const Mystery({required this.uid, super.key});
@@ -211,47 +233,48 @@ class _MysteryState extends State<Mystery> {
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10))),
-                        onPressed: () {
-                          int random = Random().nextInt(100);
+                        onPressed: () async {
+                          if (await updateGP(-200, uid, context)) {
+                            int random = Random().nextInt(100);
 
-                          if (random < 50) {
-                            itemList.add("common");
-                            alert("lib/assets/common.png", "common");
+                            if (random < 50) {
+                              itemList.add("common");
+                              alert("lib/assets/common.png", "common");
+                            }
+
+                            if (random >= 50 && random < 80) {
+                              itemList.add("rare");
+                              alert("lib/assets/rare.png", "rare");
+                            }
+
+                            if (random >= 80 && random < 90) {
+                              itemList.add("epic");
+                              alert("lib/assets/epic.png", "epic");
+                            }
+
+                            if (random >= 90 && random < 97) {
+                              itemList.add("legendary");
+                              alert("lib/assets/legend.png", "legendary");
+                            }
+
+                            if (random >= 97) {
+                              itemList.add("mythical");
+                              alert("lib/assets/mythic.png", "mythical");
+                            }
+
+                            print(itemList.join(","));
+
+                            final inventRef = FirebaseFirestore.instance
+                                .collection('gameInventory')
+                                .doc(inventoryID);
+
+                            inventRef.get().then((docSnapshot) async => {
+                                  inventRef.update({
+                                    'items': itemList,
+                                  })
+                                });
+                            setState(() {});
                           }
-
-                          if (random >= 50 && random < 80) {
-                            itemList.add("rare");
-                            alert("lib/assets/rare.png", "rare");
-                          }
-
-                          if (random >= 80 && random < 90) {
-                            itemList.add("epic");
-                            alert("lib/assets/epic.png", "epic");
-                          }
-
-                          if (random >= 90 && random < 97) {
-                            itemList.add("legendary");
-                            alert("lib/assets/legend.png", "legendary");
-                          }
-
-                          if (random >= 97) {
-                            itemList.add("mythical");
-                            alert("lib/assets/mythic.png", "mythical");
-                          }
-
-                          print(itemList.join(","));
-
-                          final inventRef = FirebaseFirestore.instance
-                              .collection('gameInventory')
-                              .doc(inventoryID);
-
-                          inventRef.get().then((docSnapshot) async => {
-                                inventRef.update({
-                                  'items': itemList,
-                                })
-                              });
-
-                          setState(() {});
                         },
                         child: const Text(
                           "Buy",

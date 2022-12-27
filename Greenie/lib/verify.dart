@@ -1,3 +1,4 @@
+import 'package:bitcointicker/home.dart';
 import 'package:bitcointicker/phone.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -164,7 +165,7 @@ class _MyVerifyState extends State<MyVerify> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    UserProfile(uid: uid.toString()),
+                                    Homepage(uid: uid.toString()),
                               ));
                         });
                       } on FirebaseAuthException catch (e) {
