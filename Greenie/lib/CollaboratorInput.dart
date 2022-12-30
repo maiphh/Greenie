@@ -24,10 +24,10 @@ Future<String?> getToken() async {
   return token;
 }
 
-Future<dynamic> realData(int GP, String? uid) async {
+Future<dynamic> realData(int GP, String? uid, String? token) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref("");
   final snapshot = await ref.get();
-  final token = await getToken();
+  // final token = await getToken();
 
   // if (!snapshot.exists) {
   //   print("Hello");
@@ -42,12 +42,12 @@ Future<dynamic> realData(int GP, String? uid) async {
   return snapshot;
 }
 
-Future updateRealtimeDatabase(int GP, String? uid) async {
+Future updateRealtimeDatabase(int GP, String? uid, String? token) async {
   // DatabaseReference ref = FirebaseDatabase.instance.ref("data");
   // await ref.set({
   //   {"GP": 10, "key": "bla", "uID": ""}
   // });
-  return realData(GP, uid);
+  return realData(GP, uid, token);
 }
 
 class CollaboratorInput extends StatelessWidget {
@@ -86,9 +86,12 @@ class CollaboratorInput extends StatelessWidget {
                   if (_formKey.currentState!.validate()) {
                     // If the form is valid, display a snackbar. In the real world,
                     // you'd often call a server or save the information in a database.
-                    updateGP(int.parse(controller.text), this.uid);
+                    final data = uid!.split("|");
+                    String token = data[0];
+                    String id = data[1];
+                    updateGP(int.parse(controller.text), id);
                     await updateRealtimeDatabase(
-                        int.parse(controller.text), this.uid);
+                        int.parse(controller.text), id, token);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           content: Text("Processing Data  ${controller.text}")),

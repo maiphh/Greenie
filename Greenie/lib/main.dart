@@ -1,6 +1,7 @@
 // import 'package:bitcointicker/mystery.dart';
 // import 'dart:js';
 
+import 'package:bitcointicker/CollaboratorInput.dart';
 import 'package:bitcointicker/home.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ import 'verify.dart';
 import 'phone.dart';
 import 'game.dart';
 import 'mystery.dart';
+import 'qr.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
