@@ -20,7 +20,10 @@ class _QrState extends State<Qr> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      bottomNavigationBar: BottomNavBar(uid: widget.uid),
+      bottomNavigationBar: BottomNavBar(
+        uid: widget.uid,
+        currentIndex: 1,
+      ),
       body: Stack(
         alignment: Alignment.center,
         children: [
