@@ -24,6 +24,7 @@ import 'verify.dart';
 import 'phone.dart';
 import 'game.dart';
 import 'mystery.dart';
+import 'qr.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {

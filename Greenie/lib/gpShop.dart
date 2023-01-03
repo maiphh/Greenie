@@ -278,6 +278,7 @@ class VoucherComponent extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: width * 0.015),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
                         padding: EdgeInsets.symmetric(horizontal: width * 0.05),
@@ -360,6 +361,8 @@ class VoucherComponent extends StatelessWidget {
                                         Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               this.collaborator,
@@ -807,6 +810,7 @@ class ProductComponent extends StatelessWidget {
                         )),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           this.brand,
