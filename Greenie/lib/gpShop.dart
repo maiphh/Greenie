@@ -28,6 +28,15 @@ void updateGP(int value, String uid, BuildContext context) async {
   }
 }
 
+// void updateUserVoucher(String uid, String code) async {
+//   FirebaseFirestore db = FirebaseFirestore.instance;
+//   final CollectionReference voucherRef = db.collection("voucher");
+//   await voucherRef
+//       .where('code', isEqualTo: code).
+
+//   ;
+// }
+
 class GpShop extends StatefulWidget {
   final String uid;
   const GpShop({super.key, required this.uid});
@@ -45,7 +54,10 @@ class _GpShopState extends State<GpShop> {
       body: DefaultTabController(
         length: 2,
         child: Scaffold(
-          bottomNavigationBar: BottomNavBar(uid: widget.uid),
+          bottomNavigationBar: BottomNavBar(
+            uid: widget.uid,
+            currentIndex: 2,
+          ),
           backgroundColor: Colors.white,
           appBar: AppBar(
               title: Text("foo"),
@@ -100,7 +112,14 @@ class VoucherStreamBuilder extends StatelessWidget {
           if (snapshot.hasError) {
             return Text("Something went wrong hahahha${snapshot.error}");
           } else if (snapshot.hasData) {
-            final components = snapshot.data!;
+            var components = snapshot.data!;
+            List<Voucher> newComponents = [];
+            for (Voucher voucher in components) {
+              if (voucher.user == "") {
+                newComponents.add(voucher);
+              }
+            }
+            components = newComponents;
             return ListView(
                 children: components
                     .map((component) => VoucherComponent(
@@ -202,21 +221,6 @@ class Voucher {
   }
 }
 
-Widget buildVoucher(Voucher component) {
-  return VoucherComponent(
-    uid: '',
-    code: component.code,
-    collaborator: component.collaborator,
-    description: component.description,
-    discount: component.discount,
-    expiryDate: component.expiryDate,
-    logoPath: component.logoPath,
-    name: component.name,
-    price: component.price,
-    user: component.user,
-  );
-}
-
 class VoucherComponent extends StatelessWidget {
   final String code;
   final String collaborator;
@@ -226,7 +230,7 @@ class VoucherComponent extends StatelessWidget {
   String logoPath;
   final String name;
   final int price;
-  final String user;
+  String user;
   String uid;
   VoucherComponent(
       {super.key,
@@ -306,13 +310,6 @@ class VoucherComponent extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: width * 0.05),
                         ),
-                        // Text(
-                        //   this.name,
-                        //   style: TextStyle(
-                        //       color: Colors.black54,
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: width * 0.04),
-                        // ),
                         Text(
                           "Discount: ${(this.discount * 100).toInt()}%",
                           style: TextStyle(
@@ -339,7 +336,12 @@ class VoucherComponent extends StatelessWidget {
                           QuickAlert.show(
                               onConfirmBtnTap: () {
                                 updateGP(-this.price, uid, context);
+                                // user = this.uid;
                                 Navigator.pop(context);
+                                QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Purchase Successfully!");
                               },
                               context: context,
                               type: QuickAlertType.confirm,
@@ -575,6 +577,7 @@ class _SuggestionsState extends State<Suggestions>
                         "Something went wrong hahahha${snapshot.error}");
                   } else if (snapshot.hasData) {
                     var components = snapshot.data!;
+
                     if (widget.productFilterCallback != null) {
                       components = widget.productFilterCallback!(components);
                     }
@@ -605,6 +608,13 @@ class _SuggestionsState extends State<Suggestions>
                     if (widget.voucherFilterCallback != null) {
                       components = widget.voucherFilterCallback!(components);
                     }
+                    List<Voucher> newComponents = [];
+                    for (Voucher voucher in components) {
+                      if (voucher.user == "") {
+                        newComponents.add(voucher);
+                      }
+                    }
+                    components = newComponents;
                     return ListView(
                         children: components
                             .map((component) => VoucherComponent(
@@ -845,7 +855,11 @@ class ProductComponent extends StatelessWidget {
                           QuickAlert.show(
                               onConfirmBtnTap: () {
                                 updateGP(-this.price, uid, context);
-                                // Navigator.pop();
+                                Navigator.pop(context);
+                                QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Purchase Successfully!");
                               },
                               context: context,
                               type: QuickAlertType.confirm,

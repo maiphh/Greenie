@@ -99,9 +99,7 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.green),
-      // initialRoute: 'login',
       initialRoute: 'login',
-
       routes: {
         'mystery': (context) =>
             const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),

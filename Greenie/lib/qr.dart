@@ -41,7 +41,10 @@ class _QrState extends State<Qr> {
           }
           String result = snapshot.data.toString();
           return Scaffold(
-            bottomNavigationBar: BottomNavBar(uid: widget.uid),
+            bottomNavigationBar: BottomNavBar(
+              uid: widget.uid,
+              currentIndex: 1,
+            ),
             body: Stack(
               alignment: Alignment.center,
               children: [
