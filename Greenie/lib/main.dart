@@ -100,7 +100,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.green),
       // initialRoute: 'login',
-      initialRoute: 'collaboratorInput',
+      initialRoute: 'login',
 
       routes: {
         'mystery': (context) =>
