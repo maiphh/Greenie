@@ -1,7 +1,9 @@
 // import 'package:bitcointicker/mystery.dart';
 // import 'dart:js';
 
+import 'package:bitcointicker/CollaboratorInput.dart';
 import 'package:bitcointicker/home.dart';
+import 'package:bitcointicker/qrScanner.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
@@ -22,6 +24,7 @@ import 'verify.dart';
 import 'phone.dart';
 import 'game.dart';
 import 'mystery.dart';
+import 'qr.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
@@ -96,9 +99,7 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.green),
-      // initialRoute: 'login',
       initialRoute: 'login',
-
       routes: {
         'mystery': (context) =>
             const Mystery(uid: "mLOlF0uTBLcwRzzGCdi3RXJ2SSp2"),
@@ -106,8 +107,11 @@ class MyApp extends StatelessWidget {
         'home': (context) => Homepage(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
         'login': (context) => const MyPhone(),
         'signup': (context) => const Signup(),
+        'QrScanner': (context) => const QRScanPage(),
         // 'shop': (context) => const GpShop(uid: "bchUjZi23OdRSFWuq0sGMjOfdTn2"),
         'pin': (context) => const MyVerify(),
+        'collaboratorInput': (context) =>
+            CollaboratorInput(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
         // 'game': (context) => const Game(uid: "rss0sFQri3gHQFWpKYTegWr0lvb2"),
       },
     );
