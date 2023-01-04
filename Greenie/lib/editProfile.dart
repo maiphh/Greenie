@@ -10,16 +10,18 @@ import 'user.dart';
 
 class EditProfile extends StatefulWidget {
   final String uid;
-  const EditProfile({super.key, required this.uid});
+  final String name;
+  const EditProfile({super.key, required this.uid, required this.name});
 
   @override
   // ignore: no_logic_in_create_state
-  State<EditProfile> createState() => _EditProfileState(uid);
+  State<EditProfile> createState() => _EditProfileState(uid, name);
 }
 
 class _EditProfileState extends State<EditProfile> {
   String uid;
-  _EditProfileState(this.uid);
+  String name;
+  _EditProfileState(this.uid, this.name);
 
   File? image;
   String finalPath = "";
@@ -131,6 +133,7 @@ class _EditProfileState extends State<EditProfile> {
                         uploadImage(finalPath);
                         if (finalPath == "")
                           finalPath = "https://i.stack.imgur.com/l60Hf.png";
+                        if (username == "") username = name;
                         usersRef.get().then((docSnapshot) async => {
                               await usersRef.update(
                                   {'name': username, 'avatar': finalPath})

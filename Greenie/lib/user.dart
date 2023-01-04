@@ -19,7 +19,6 @@ class UserProfile extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State<UserProfile> createState() => _UserProfileState(uid);
 }
-
 class _UserProfileState extends State<UserProfile> {
   // @override
   // void initState() async {
@@ -34,6 +33,7 @@ class _UserProfileState extends State<UserProfile> {
   //   });
   // }
   String uid;
+
 
   _UserProfileState(this.uid);
 
@@ -86,6 +86,7 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
+    String username = "";
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Stack(
@@ -145,6 +146,7 @@ class _UserProfileState extends State<UserProfile> {
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.done) {
+                                            username = data['name'];
                                             return Text(
                                               data['name'],
                                               style: const TextStyle(
@@ -184,7 +186,7 @@ class _UserProfileState extends State<UserProfile> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  EditProfile(uid: uid),
+                                                  EditProfile(uid: uid, name: username),
                                             ));
                                       },
                                       child: const Text(
