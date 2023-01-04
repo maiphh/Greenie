@@ -28,14 +28,17 @@ void updateGP(int value, String uid, BuildContext context) async {
   }
 }
 
-// void updateUserVoucher(String uid, String code) async {
-//   FirebaseFirestore db = FirebaseFirestore.instance;
-//   final CollectionReference voucherRef = db.collection("voucher");
-//   await voucherRef
-//       .where('code', isEqualTo: code).
+void updateUserVoucher(String uid, String docId) async {
+  // FirebaseFirestore db = FirebaseFirestore.instance;
+  // final CollectionReference voucherRef = db.collection("voucher");
+  // await voucherRef
+  //     .where('code', isEqualTo: code).
 
-//   ;
-// }
+  // ;
+  final docVoucher =
+      FirebaseFirestore.instance.collection("voucher").doc(docId);
+  docVoucher.update({'user': uid});
+}
 
 class GpShop extends StatefulWidget {
   final String uid;
@@ -123,6 +126,7 @@ class VoucherStreamBuilder extends StatelessWidget {
             return ListView(
                 children: components
                     .map((component) => VoucherComponent(
+                          docId: component.docId,
                           uid: this.uid,
                           code: component.code,
                           collaborator: component.collaborator,
@@ -184,10 +188,12 @@ Stream<List<Product>> readProducts() => FirebaseFirestore.instance
 Stream<List<Voucher>> readVouchers() => FirebaseFirestore.instance
     .collection('voucher')
     .snapshots()
-    .map((snapshot) =>
-        snapshot.docs.map((doc) => Voucher.fromJSON(doc.data())).toList());
+    .map((snapshot) => snapshot.docs
+        .map((doc) => Voucher.fromJSON(doc.data(), doc.id))
+        .toList());
 
 class Voucher {
+  final String docId;
   final String code;
   final String collaborator;
   final String description;
@@ -199,6 +205,7 @@ class Voucher {
   final String user;
   const Voucher(
       {required this.code,
+      required this.docId,
       required this.collaborator,
       required this.description,
       required this.discount,
@@ -207,8 +214,9 @@ class Voucher {
       required this.name,
       required this.price,
       required this.user});
-  static Voucher fromJSON(Map<String, dynamic> json) {
+  static Voucher fromJSON(Map<String, dynamic> json, String docId) {
     return Voucher(
+        docId: docId,
         code: json['code'],
         collaborator: json['collaborator'],
         description: json['description'],
@@ -223,6 +231,7 @@ class Voucher {
 
 class VoucherComponent extends StatelessWidget {
   final String code;
+  String docId;
   final String collaborator;
   final String description;
   final double discount;
@@ -234,6 +243,7 @@ class VoucherComponent extends StatelessWidget {
   String uid;
   VoucherComponent(
       {super.key,
+      required this.docId,
       required this.code,
       required this.uid,
       required this.collaborator,
@@ -336,6 +346,7 @@ class VoucherComponent extends StatelessWidget {
                           QuickAlert.show(
                               onConfirmBtnTap: () {
                                 updateGP(-this.price, uid, context);
+                                updateUserVoucher(uid, docId);
                                 // user = this.uid;
                                 Navigator.pop(context);
                                 QuickAlert.show(
@@ -618,6 +629,7 @@ class _SuggestionsState extends State<Suggestions>
                     return ListView(
                         children: components
                             .map((component) => VoucherComponent(
+                                  docId: component.docId,
                                   uid: widget.uid,
                                   code: component.code,
                                   collaborator: component.collaborator,

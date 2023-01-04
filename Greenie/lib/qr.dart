@@ -1,3 +1,4 @@
+import 'package:bitcointicker/user.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'home.dart';
@@ -61,18 +62,58 @@ class _QrState extends State<Qr> {
                   child: Stack(
                     alignment: Alignment.topCenter,
                     children: [
-                      SizedBox(
-                        height: height * 0.8,
-                        child: const Image(
-                          image: AssetImage("lib/assets/Qr holder.png"),
-                        ),
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: height * 0.75,
+                            child: const Image(
+                              image: AssetImage("lib/assets/Qr holder.png"),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        UserProfile(uid: widget.uid),
+                                  ));
+                            },
+                            child: Container(
+                              width: width * 0.88,
+                              height: height * 0.05,
+                              child: Row(children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Icon(
+                                    IconData(0xf06bd,
+                                        fontFamily: 'MaterialIcons'),
+                                    color: Colors.green[700],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("My vouchers"),
+                                ),
+                                new Spacer(),
+                                Icon(Icons.arrow_forward),
+                                SizedBox(
+                                  width: 10,
+                                )
+                              ]),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                          )
+                        ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 80),
                         child: Column(
                           children: [
                             SizedBox(
-                              height: height * 0.05,
+                              height: height * 0.03,
                             ),
                             const Text(
                               "Give This To The Cashier",
@@ -89,42 +130,6 @@ class _QrState extends State<Qr> {
                             ),
                             QrImage(size: 280, data: result),
                             const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(15)),
-                                color: const Color(0xFFB1F39A),
-                                border: Border.all(
-                                  color: const Color(0xFF7BC143),
-                                  width: 2,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: const [
-                                      Text(
-                                        "GP Wallet",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text("15 GP"),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 50,
-                                  ),
-                                  const Image(
-                                    image:
-                                        AssetImage("lib/assets/plusicon.png"),
-                                  )
-                                ],
-                              ),
-                            ),
                           ],
                         ),
                       ),
