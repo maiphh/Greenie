@@ -346,48 +346,6 @@ class countReward extends StatelessWidget {
   }
 }
 
-class TopBar extends StatefulWidget {
-  const TopBar({super.key});
-
-  @override
-  State<TopBar> createState() => _TopBarState();
-}
-
-class _TopBarState extends State<TopBar> {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          // color: Colors.black,
-          decoration: const BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10))),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_back)),
-              Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    // ignore: prefer_const_constructors
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                      Colors.green[300],
-                    )),
-                    child: const Text('TuanCuiBuonBa'),
-                  ))
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
 
 class TreeGrid extends StatefulWidget {
   const TreeGrid({super.key});
