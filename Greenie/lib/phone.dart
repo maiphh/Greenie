@@ -312,6 +312,10 @@ class _MyPhoneState extends State<MyPhone> {
               const SizedBox(
                 height: 20,
               ),
+              // const SizedBox(
+              //       height: 20,
+              //     ),
+
               SizedBox(
                 width: double.infinity,
                 height: 45,
@@ -325,6 +329,7 @@ class _MyPhoneState extends State<MyPhone> {
                     child: const Text("Send the code")),
               ),
               const SizedBox(height: 20),
+
               Row(children: const <Widget>[
                 Expanded(
                   child: Divider(
@@ -341,21 +346,21 @@ class _MyPhoneState extends State<MyPhone> {
                 ),
               ]),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                    icon: const Icon(facebook),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1778F2),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                    onPressed: () async {
-                      _loginwithfacebook();
-                    },
-                    label: const Text("Continue with Facebook")),
-              ),
-              const SizedBox(height: 10),
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 45,
+              //   child: ElevatedButton.icon(
+              //       icon: const Icon(facebook),
+              //       style: ElevatedButton.styleFrom(
+              //           backgroundColor: const Color(0xFF1778F2),
+              //           shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10))),
+              //       onPressed: () async {
+              //         _loginwithfacebook();
+              //       },
+              //       label: const Text("Continue with Facebook")),
+              // ),
+              // const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 height: 45,

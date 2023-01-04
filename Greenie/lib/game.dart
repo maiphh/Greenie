@@ -118,7 +118,11 @@ class _GameState extends State<Game> {
             icon: Icon(Icons.shopping_cart),
           )
         ],
-        title: Center(child: Text("Mini Planet", style: TextStyle(fontSize: 23),)),
+        title: Center(
+            child: Text(
+          "Mini Planet",
+          style: TextStyle(fontSize: 23),
+        )),
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -337,8 +341,14 @@ class countReward extends StatelessWidget {
               reward += a.count * int.parse(a.reward);
             }
             return Padding(
-                padding: EdgeInsets.fromLTRB(0,0,0,50),
-                child: Text("Reward: ${reward}GPs/ min",style: TextStyle(fontSize:16, fontWeight: FontWeight.bold, color: Colors.green[600]),));
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                child: Text(
+                  "Reward: ${reward}GPs/ min",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[600]),
+                ));
           },
         );
       },
@@ -480,16 +490,19 @@ class displayGameInventory extends StatelessWidget {
                 }
               }
               print(itemImages.length);
-              return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
-                  itemCount: itemImages.length,
-                  itemBuilder: ((BuildContext context, int index) {
-                    return Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Image.asset(itemImages[index]),
-                    );
-                  }));
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 200),
+                child: (GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3),
+                    itemCount: itemImages.length,
+                    itemBuilder: ((BuildContext context, int index) {
+                      return Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Image.asset(itemImages[index]),
+                      );
+                    }))),
+              );
             });
       },
     );

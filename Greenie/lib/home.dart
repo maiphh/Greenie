@@ -93,49 +93,19 @@ class Content extends StatelessWidget {
             StatusPad(
               uid: this.uid,
             ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+              child: Text(
+                "Collaborators",
+                style: TextStyle(
+                    color: Colors.green[700],
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
             ItemList(),
-            History()
           ],
         ),
-      ),
-    );
-  }
-}
-
-class History extends StatelessWidget {
-  const History({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 150,
-      child: ListView(
-        // primary: false,
-        shrinkWrap: true,
-
-        scrollDirection: Axis.vertical,
-        children: [
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            color: Colors.greenAccent,
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            color: Colors.greenAccent,
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            color: Colors.greenAccent,
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            color: Colors.greenAccent,
-          ),
-        ],
       ),
     );
   }
@@ -157,7 +127,7 @@ class _ItemListState extends State<ItemList> {
     }
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
-      height: 230,
+      height: 300,
       child: ListView(
         // padding: EdgeInsets.only(left: 20),
 
@@ -176,8 +146,8 @@ class Item extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         margin: const EdgeInsets.only(right: 20),
-        width: 180,
-        // height: 100,
+        width: 200,
+        height: 300,
         decoration: BoxDecoration(
             image: DecorationImage(image: itemImage),
             gradient: const LinearGradient(
@@ -197,7 +167,7 @@ class StatusPad extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: 380,
-        height: 180,
+        height: 210,
         margin: EdgeInsets.only(top: 20),
         decoration: BoxDecoration(
             // backgroundBlendMode: BlendMode.hardLight,
@@ -270,8 +240,8 @@ class GreetingAndNotification extends StatelessWidget {
         Text(
           "Hi $userName,",
           style: GoogleFonts.workSans(
-              textStyle: const TextStyle(
-                  color: Color(0xFF51C57D),
+              textStyle: TextStyle(
+                  color: Colors.green[700],
                   fontSize: 18,
                   fontWeight: FontWeight.w600)),
         ),
