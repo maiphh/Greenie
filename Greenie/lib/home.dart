@@ -2,14 +2,30 @@ import 'package:bitcointicker/game.dart';
 import 'package:bitcointicker/gpShop.dart';
 import 'package:bitcointicker/qr.dart';
 import 'package:bitcointicker/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
+import "game.dart";
 
-String userName = "quangrmit";
-double balance = 15.99;
+String userName = "";
+int balance = 0;
 String currency = "GP";
-int treesPlanted = 13;
+int treesPlanted = 0;
+Future getData(String uid) async {
+  final docUser = FirebaseFirestore.instance.collection("userProfile").doc(uid);
+  var data = await docUser.get();
+  balance = data['GP'];
+  userName = data['name'];
+
+  var gameId = await getInventoryID(uid);
+  final docTrees =
+      FirebaseFirestore.instance.collection("gameInventory").doc(gameId);
+  var treeData = await docTrees.get();
+
+  treesPlanted = treeData["items"].length;
+}
+
 Icon normalNotificationIcon = const Icon(Icons.notifications_none_outlined);
 Icon shoppingCartIcon = const Icon(
   Icons.shopping_cart_outlined,
@@ -23,30 +39,46 @@ Icon personIcon = const Icon(
   Icons.person_outline,
   color: Color(0xFF7BC143),
 );
-String assetImagesDir = "assets/images";
+String assetImagesDir = "lib/assets";
 List<AssetImage> itemImages = [
-  AssetImage("$assetImagesDir/item1.png"),
-  AssetImage("$assetImagesDir/item2.png")
+  AssetImage("$assetImagesDir/logo-starbucks-1992.png"),
+  AssetImage("$assetImagesDir/Highlands_Coffee_logo.svg.png"),
+  AssetImage("$assetImagesDir/logo-katinat-text.webp"),
+  AssetImage("$assetImagesDir/logo-phuc-long-coffee-and-tea.webp")
 ];
 
-class Homepage extends StatelessWidget {
+class Homepage extends StatefulWidget {
   String uid;
+
   Homepage({super.key, required this.uid});
 
+  @override
+  State<Homepage> createState() => _HomepageState();
+}
+
+class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(children: const [
-        Content(),
+      body: Stack(children: [
+        FutureBuilder(
+            future: getData(widget.uid),
+            builder: ((context, snapshot) {
+              return Content(uid: this.widget.uid);
+            })),
       ]),
-      bottomNavigationBar: BottomNavBar(uid: this.uid),
+      bottomNavigationBar: BottomNavBar(
+        uid: this.widget.uid,
+        currentIndex: 0,
+      ),
     );
   }
 }
 
 class Content extends StatelessWidget {
-  const Content({super.key});
+  String uid;
+  Content({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +88,11 @@ class Content extends StatelessWidget {
         height: 1000,
         child: ListView(
           scrollDirection: Axis.vertical,
-          children: const [
+          children: [
             GreetingAndNotification(),
-            StatusPad(),
+            StatusPad(
+              uid: this.uid,
+            ),
             ItemList(),
             History()
           ],
@@ -156,7 +190,8 @@ class Item extends StatelessWidget {
 }
 
 class StatusPad extends StatelessWidget {
-  const StatusPad({super.key});
+  String uid;
+  StatusPad({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -173,13 +208,19 @@ class StatusPad extends StatelessWidget {
                 colors: <Color>[Color(0xFF0E4123), Color(0xFF94E7AE)]),
             image: const DecorationImage(
                 alignment: Alignment.centerRight,
-                image: AssetImage('assets/images/tree_background.png'))),
-        child: const StatusPadContent());
+                image: AssetImage("lib/assets/tree_background.png"))),
+        child: FutureBuilder(
+          future: getData(this.uid),
+          builder: (context, snapshot) {
+            return StatusPadContent(uid: this.uid);
+          },
+        ));
   }
 }
 
 class StatusPadContent extends StatelessWidget {
-  const StatusPadContent({super.key});
+  String uid;
+  StatusPadContent({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -234,12 +275,6 @@ class GreetingAndNotification extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w600)),
         ),
-        Transform.scale(
-            scale: 1.25,
-            child: IconButton(
-              onPressed: () {},
-              icon: normalNotificationIcon,
-            ))
       ],
     );
   }
@@ -247,20 +282,19 @@ class GreetingAndNotification extends StatelessWidget {
 
 class BottomNavBar extends StatefulWidget {
   String uid;
-  BottomNavBar({super.key, required this.uid});
+  int currentIndex;
+  BottomNavBar({super.key, required this.uid, required this.currentIndex});
 
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int currentIndex = 0;
-
-  setBottomBarIndex(index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
+  // setBottomBarIndex(index) {
+  //   setState(() {
+  //     currentIndex = index;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +325,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     },
                     child: const ImageIcon(
                       AssetImage("lib/assets/nav_globe.png"),
-                      size: 50,
+                      size: 90,
                       color: Color.fromARGB(255, 33, 103, 36),
                     )),
               ),
@@ -304,12 +338,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     IconButton(
                       icon: Icon(
                         Icons.home_outlined,
-                        color: currentIndex == 0
+                        color: widget.currentIndex == 0
                             ? Color(0xFF7BC143)
                             : Colors.grey.shade400,
                       ),
                       onPressed: () {
-                        setBottomBarIndex(0);
+                        // setBottomBarIndex(0);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -321,12 +355,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     IconButton(
                         icon: Icon(
                           Icons.qr_code_scanner_outlined,
-                          color: currentIndex == 1
+                          color: widget.currentIndex == 1
                               ? Color(0xFF7BC143)
                               : Colors.grey.shade400,
                         ),
                         onPressed: () {
-                          setBottomBarIndex(1);
+                          // setBottomBarIndex(1);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -339,12 +373,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     IconButton(
                         icon: Icon(
                           Icons.shopping_cart_outlined,
-                          color: currentIndex == 2
+                          color: widget.currentIndex == 2
                               ? Color(0xFF7BC143)
                               : Colors.grey.shade400,
                         ),
                         onPressed: () {
-                          setBottomBarIndex(2);
+                          // setBottomBarIndex(2);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -354,12 +388,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     IconButton(
                         icon: Icon(
                           Icons.person_outlined,
-                          color: currentIndex == 3
+                          color: widget.currentIndex == 3
                               ? Color(0xFF7BC143)
                               : Colors.grey.shade400,
                         ),
                         onPressed: () {
-                          setBottomBarIndex(3);
+                          // setBottomBarIndex(3);
                           Navigator.push(
                               context,
                               MaterialPageRoute(

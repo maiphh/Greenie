@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'editProfile.dart';
 import 'phone.dart';
 import 'home.dart';
+import 'gpShop.dart';
 
 class UserProfile extends StatefulWidget {
   final String uid;
@@ -100,7 +101,10 @@ class _UserProfileState extends State<UserProfile> {
           ),
         ),
         Scaffold(
-          bottomNavigationBar: BottomNavBar(uid: widget.uid),
+          bottomNavigationBar: BottomNavBar(
+            uid: widget.uid,
+            currentIndex: 3,
+          ),
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -271,26 +275,47 @@ class _UserProfileState extends State<UserProfile> {
                           const Divider(
                             thickness: 2.5,
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: height * 0.15,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: height * 0.15,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
+                          Flexible(
+                            child: StreamBuilder(
+                                stream: readVouchers(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text(
+                                        "Something went wrong hahahha${snapshot.error}");
+                                  } else if (snapshot.hasData) {
+                                    var components = snapshot.data!;
+                                    List<Voucher> newComponents = [];
+                                    for (Voucher voucher in components) {
+                                      if (voucher.user == this.uid) {
+                                        newComponents.add(voucher);
+                                      }
+                                    }
+                                    components = newComponents;
+                                    return ListView(
+                                        children: components
+                                            .map((component) => UserVoucher(
+                                                  uid: this.uid,
+                                                  code: component.code,
+                                                  collaborator:
+                                                      component.collaborator,
+                                                  description:
+                                                      component.description,
+                                                  discount: component.discount,
+                                                  expiryDate:
+                                                      component.expiryDate,
+                                                  logoPath: component.logoPath,
+                                                  name: component.name,
+                                                  price: component.price,
+                                                  user: component.user,
+                                                ))
+                                            .toList());
+                                  } else {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                }),
+                          )
                         ],
                       ),
                     ),
@@ -320,6 +345,96 @@ class _UserProfileState extends State<UserProfile> {
           ),
         )
       ],
+    );
+  }
+}
+
+class UserVoucher extends StatelessWidget {
+  final String code;
+  final String collaborator;
+  final String description;
+  final double discount;
+  final String expiryDate;
+  String logoPath;
+  final String name;
+  final int price;
+  final String user;
+  String uid;
+  UserVoucher(
+      {super.key,
+      required this.code,
+      required this.uid,
+      required this.collaborator,
+      required this.description,
+      required this.discount,
+      required this.expiryDate,
+      required this.logoPath,
+      required this.name,
+      required this.price,
+      required this.user});
+  getImageUrl() async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final ref = storageRef.child(logoPath);
+    final url = await ref.getDownloadURL();
+    logoPath = url;
+    return logoPath;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width * 0.9;
+    double height = MediaQuery.of(context).size.height * 1 / 9;
+    return Container(
+      height: height * 1.9,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                  child: FutureBuilder(
+                    future: getImageUrl(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return Image(
+                            height: height,
+                            width: width * 0.2,
+                            image: NetworkImage(this.logoPath));
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  )),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    this.collaborator,
+                    style: TextStyle(
+                        color: const Color(0xff37734D),
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * 0.05),
+                  ),
+                  Text(
+                    "Discount: ${(this.discount * 100).toInt()}%",
+                    style: TextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * 0.04),
+                  ),
+                  Text(
+                    "Price: " + "${this.price}" + " GP",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.normal,
+                        fontSize: width * 0.04),
+                  )
+                ],
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }

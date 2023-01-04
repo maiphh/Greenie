@@ -102,21 +102,23 @@ class _GameState extends State<Game> {
     Widget buildGameItem(GameItem gameItem) => Foo(
           gameItem: gameItem,
         );
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.green,
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Mystery(uid: widget.uid),
-                    ));
-              },
-              icon: Icon(Icons.shop))
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Mystery(uid: widget.uid),
+                  ));
+            },
+            icon: Icon(Icons.shopping_cart),
+          )
         ],
-
-        backgroundColor: Colors.green,
+        title: Center(child: Text("Mini Planet", style: TextStyle(fontSize: 23),)),
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -126,129 +128,103 @@ class _GameState extends State<Game> {
       ),
       body: SlidingUpPanel(
         backdropEnabled: true,
-        panel: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Text(
-                'Tree List',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+        panel: Column(children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: Text(
+              'Tree List',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection("gameInventory")
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData)
-                    return const Center(child: CircularProgressIndicator());
-                  // Counting 123
-                  // var counts = {
-                  //   "common": 0,
-                  //   "rare": 0,
-                  //   "epic": 0,
-                  //   "legendary": 0,
-                  //   "mythical": 0
-                  // };
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection("gameInventory")
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData)
+                  return const Center(child: CircularProgressIndicator());
 
-                  // int common = 0;
-                  // final gameList = snapshot.data!.docs.where((DocumentSnapshot document) { return document.id == uidGlobal;}).map((DocumentSnapshot document) {
-                  //   final itemList = document['items'];
-                  //   for (String i in itemList) {
-                  //     counts[i] = counts[i]! + 1;
+                return FutureBuilder(
+                  future: getInventoryID(uidGlobal),
+                  builder: (_, snap) {
+                    if (!snap.hasData)
+                      return const Center(child: CircularProgressIndicator());
+                    var counts = {
+                      "common": 0,
+                      "rare": 0,
+                      "epic": 0,
+                      "legendary": 0,
+                      "mythical": 0
+                    };
+                    int common = 0;
+                    String inventoryID = snap.data.toString();
+                    final gameList =
+                        snapshot.data!.docs.where((DocumentSnapshot document) {
+                      return document.id == inventoryID;
+                    }).map((DocumentSnapshot document) {
+                      final itemList = document['items'];
+                      for (String i in itemList) {
+                        counts[i] = counts[i]! + 1;
+                      }
+                      return common;
+                    });
+                    String result = gameList.first.toString();
+                    // print(counts.toString());
+                    String another = counts["common"].toString();
+                    // Need to loop through game Item
+                    // FInd the old reference
+                    GameItem a1 = new GameItem(
+                        image: "lib/assets/common.png",
+                        name: "Common",
+                        reward: "5",
+                        count: counts["common"]!);
+                    GameItem a2 = new GameItem(
+                        image: "lib/assets/rare.png",
+                        name: "Rare",
+                        reward: "10",
+                        count: counts["rare"]!);
+                    GameItem a3 = new GameItem(
+                        image: "lib/assets/epic.png",
+                        name: "Epic",
+                        reward: "20",
+                        count: counts["epic"]!);
+                    GameItem a4 = new GameItem(
+                        image: "lib/assets/legend.png",
+                        name: "Legendary",
+                        reward: "50",
+                        count: counts["legendary"]!);
+                    GameItem a5 = new GameItem(
+                        image: "lib/assets/mythic.png",
+                        name: "Mythical",
+                        reward: "100",
+                        count: counts["mythical"]!);
 
-                  //   }
-                  //   return common;
-                  // });
-                  // String result = gameList.first.toString();
-                  // print(counts.toString());
-                  return FutureBuilder(
-                    future: getInventoryID(uidGlobal),
-                    builder: (_, snap) {
-                      if (!snap.hasData)
-                        return const Center(child: CircularProgressIndicator());
-                      var counts = {
-                        "common": 0,
-                        "rare": 0,
-                        "epic": 0,
-                        "legendary": 0,
-                        "mythical": 0
-                      };
-                      int common = 0;
-                      String inventoryID = snap.data.toString();
-                      final gameList = snapshot.data!.docs
-                          .where((DocumentSnapshot document) {
-                        return document.id == inventoryID;
-                      }).map((DocumentSnapshot document) {
-                        final itemList = document['items'];
-                        for (String i in itemList) {
-                          counts[i] = counts[i]! + 1;
-                        }
-                        return common;
-                      });
-                      String result = gameList.first.toString();
-                      // print(counts.toString());
-                      String another = counts["common"].toString();
-                      // Need to loop through game Item
-                      // FInd the old reference
-                      GameItem a1 = new GameItem(
-                          image: "lib/assets/common.png",
-                          name: "Common",
-                          reward: "5",
-                          count: counts["common"]!);
-                      GameItem a2 = new GameItem(
-                          image: "lib/assets/rare.png",
-                          name: "Rare",
-                          reward: "10",
-                          count: counts["rare"]!);
-                      GameItem a3 = new GameItem(
-                          image: "lib/assets/epic.png",
-                          name: "Epic",
-                          reward: "20",
-                          count: counts["epic"]!);
-                      GameItem a4 = new GameItem(
-                          image: "lib/assets/legend.png",
-                          name: "Legendary",
-                          reward: "50",
-                          count: counts["legendary"]!);
-                      GameItem a5 = new GameItem(
-                          image: "lib/assets/mythic.png",
-                          name: "Mythical",
-                          reward: "100",
-                          count: counts["mythical"]!);
-
-                      final gameItem = [a1, a2, a3, a4, a5];
-                      return ListView(
-                        children: gameItem.map(buildGameItem).toList(),
-                      );
-                    },
-                  );
-
-                  // if (snapshot.hasError) {
-                  //   return Text('Error = ${snapshot.error}');
-                  // } else if (snapshot.hasData) {
-                  //   final GameItem = snapshot.data!;
-
-                  //   return ListView(
-                  //     // children: GameItem.map(buildGameItem).toList(),
-
-                  //   );
-
-                  //   // GameItem.map(buildGameItem).toList();
-                  // } else {
-                  //   return const Center(child: CircularProgressIndicator());
-                  // }
-                },
-              ),
+                    final gameItem = [a1, a2, a3, a4, a5];
+                    var totalCount = "0";
+                    for (GameItem g in gameItem) {
+                      totalCount += g.reward;
+                    }
+                    return
+                        // Column(children: [
+                        ListView(
+                      children: gameItem.map(buildGameItem).toList(),
+                    );
+                    //   Text("${totalCount}")
+                    // ]);
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+          Container(child: countReward())
+          //   Padding(
+        ]),
         collapsed: Container(
           decoration:
               BoxDecoration(borderRadius: radius, color: Colors.green[200]),
@@ -284,6 +260,88 @@ class _GameState extends State<Game> {
         ),
         borderRadius: radius,
       ),
+    );
+  }
+}
+
+class countReward extends StatelessWidget {
+  const countReward({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          FirebaseFirestore.instance.collection("gameInventory").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData)
+          return const Center(child: CircularProgressIndicator());
+
+        return FutureBuilder(
+          future: getInventoryID(uidGlobal),
+          builder: (_, snap) {
+            if (!snap.hasData)
+              return const Center(child: CircularProgressIndicator());
+            var counts = {
+              "common": 0,
+              "rare": 0,
+              "epic": 0,
+              "legendary": 0,
+              "mythical": 0
+            };
+            int common = 0;
+            String inventoryID = snap.data.toString();
+            final gameList =
+                snapshot.data!.docs.where((DocumentSnapshot document) {
+              return document.id == inventoryID;
+            }).map((DocumentSnapshot document) {
+              final itemList = document['items'];
+              for (String i in itemList) {
+                counts[i] = counts[i]! + 1;
+              }
+              return common;
+            });
+            String result = gameList.first.toString();
+            // print(counts.toString());
+            String another = counts["common"].toString();
+            // Need to loop through game Item
+            // FInd the old reference
+            GameItem a1 = new GameItem(
+                image: "lib/assets/common.png",
+                name: "Common",
+                reward: "5",
+                count: counts["common"]!);
+            GameItem a2 = new GameItem(
+                image: "lib/assets/rare.png",
+                name: "Rare",
+                reward: "10",
+                count: counts["rare"]!);
+            GameItem a3 = new GameItem(
+                image: "lib/assets/epic.png",
+                name: "Epic",
+                reward: "20",
+                count: counts["epic"]!);
+            GameItem a4 = new GameItem(
+                image: "lib/assets/legend.png",
+                name: "Legendary",
+                reward: "50",
+                count: counts["legendary"]!);
+            GameItem a5 = new GameItem(
+                image: "lib/assets/mythic.png",
+                name: "Mythical",
+                reward: "100",
+                count: counts["mythical"]!);
+
+            final gameItem = [a1, a2, a3, a4, a5];
+            var reward = 0;
+            for (GameItem a in gameItem) {
+              reward += a.count * int.parse(a.reward);
+            }
+            return Padding(
+                padding: EdgeInsets.fromLTRB(0,0,0,50),
+                child: Text("Reward: ${reward}GPs/ min",style: TextStyle(fontSize:16, fontWeight: FontWeight.bold, color: Colors.green[600]),));
+          },
+        );
+      },
     );
   }
 }
@@ -365,11 +423,6 @@ class OptionButton extends StatelessWidget {
         ));
   }
 }
-
-// final Stream<DocumentSnapshot> items = FirebaseFirestore.instance
-//     .collection('gameInventory')
-//     .doc(globalInventory)
-//     .snapshots();
 
 int commonCount = 0;
 int epicCount = 0;
