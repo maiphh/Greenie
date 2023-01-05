@@ -303,7 +303,7 @@ class VoucherComponent extends StatelessWidget {
                                 ConnectionState.done) {
                               return Image(
                                   height: height,
-                                  width: width * 0.2,
+                                  width: width * 0.15,
                                   image: NetworkImage(this.logoPath));
                             } else {
                               return CircularProgressIndicator();
@@ -824,7 +824,9 @@ class ProductComponent extends StatelessWidget {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.done) {
-                              return Image(image: NetworkImage(this.imageUrl));
+                              return Image(
+                                  width: width * 0.15,
+                                  image: NetworkImage(this.imageUrl));
                             } else {
                               return CircularProgressIndicator();
                             }

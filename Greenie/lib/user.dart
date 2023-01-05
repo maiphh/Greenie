@@ -19,6 +19,7 @@ class UserProfile extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State<UserProfile> createState() => _UserProfileState(uid);
 }
+
 class _UserProfileState extends State<UserProfile> {
   // @override
   // void initState() async {
@@ -33,7 +34,6 @@ class _UserProfileState extends State<UserProfile> {
   //   });
   // }
   String uid;
-
 
   _UserProfileState(this.uid);
 
@@ -185,8 +185,8 @@ class _UserProfileState extends State<UserProfile> {
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EditProfile(uid: uid, name: username),
+                                              builder: (context) => EditProfile(
+                                                  uid: uid, name: username),
                                             ));
                                       },
                                       child: const Text(
@@ -276,6 +276,7 @@ class _UserProfileState extends State<UserProfile> {
                             thickness: 2.5,
                           ),
                           Flexible(
+                            fit: FlexFit.values[1],
                             child: StreamBuilder(
                                 stream: readVouchers(),
                                 builder: (context, snapshot) {

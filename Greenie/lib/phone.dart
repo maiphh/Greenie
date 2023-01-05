@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_sign_in/google_sign_in.dart';
 import 'user.dart';
@@ -22,78 +22,78 @@ class MyPhone extends StatefulWidget {
 class _MyPhoneState extends State<MyPhone> {
   TextEditingController countryController = TextEditingController();
   bool login = false;
-  void _loginwithfacebook() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    setState(() {
-      login = true;
-    });
-    try {
-      final facebookLoginResult = await FacebookAuth.instance.login();
-      final userData = await FacebookAuth.instance.getUserData();
+  // void _loginwithfacebook() async {
+  //   final FirebaseAuth auth = FirebaseAuth.instance;
+  //   setState(() {
+  //     login = true;
+  //   });
+  //   try {
+  //     final facebookLoginResult = await FacebookAuth.instance.login();
+  //     final userData = await FacebookAuth.instance.getUserData();
 
-      final facebookAuthCredential = FacebookAuthProvider.credential(
-          facebookLoginResult.accessToken!.token);
-      await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-      final User? user = auth.currentUser;
-      final uid = user?.uid;
+  //     final facebookAuthCredential = FacebookAuthProvider.credential(
+  //         facebookLoginResult.accessToken!.token);
+  //     await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+  //     final User? user = auth.currentUser;
+  //     final uid = user?.uid;
 
-      // get firebase messaging token
-      final token = await FirebaseMessaging.instance.getToken();
+  //     // get firebase messaging token
+  //     final token = await FirebaseMessaging.instance.getToken();
 
-      final usersRef =
-          FirebaseFirestore.instance.collection('userProfile').doc(uid);
-      dynamic inventoryID;
-      usersRef.get().then((docSnapshot) async => {
-            if (!docSnapshot.exists)
-              {
-                await FirebaseFirestore.instance
-                    .collection("gameInventory")
-                    .add({'items': []}).then((documentSnapshot) =>
-                        inventoryID = documentSnapshot.id),
-                await usersRef.set({
-                  'email': userData['email'],
-                  'avatar': userData['picture']['data']['url'],
-                  'name': userData['name'],
-                  'GP': 0,
-                  'usercode': uid,
-                  'inventoryID': inventoryID,
-                  'registrationKey': token
-                })
-              }
-          });
-      showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      );
-      // ignore: use_build_context_synchronously
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Homepage(uid: uid.toString()),
-            ));
-      });
-    } on FirebaseAuthException catch (e) {
-      String title = "";
-      switch (e.code) {
-        case 'account-exists-with-different-credential':
-          title = 'This account exist with a different sign in provider!';
-          break;
-        case 'invalid-credential':
-          title = "Unknown error has occurred";
-          break;
-      }
-      print(title);
-    } finally {
-      setState(() {
-        login = false;
-      });
-    }
-  }
+  //     final usersRef =
+  //         FirebaseFirestore.instance.collection('userProfile').doc(uid);
+  //     dynamic inventoryID;
+  //     usersRef.get().then((docSnapshot) async => {
+  //           if (!docSnapshot.exists)
+  //             {
+  //               await FirebaseFirestore.instance
+  //                   .collection("gameInventory")
+  //                   .add({'items': []}).then((documentSnapshot) =>
+  //                       inventoryID = documentSnapshot.id),
+  //               await usersRef.set({
+  //                 'email': userData['email'],
+  //                 'avatar': userData['picture']['data']['url'],
+  //                 'name': userData['name'],
+  //                 'GP': 0,
+  //                 'usercode': uid,
+  //                 'inventoryID': inventoryID,
+  //                 'registrationKey': token
+  //               })
+  //             }
+  //         });
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return const Center(
+  //           child: CircularProgressIndicator(),
+  //         );
+  //       },
+  //     );
+  //     // ignore: use_build_context_synchronously
+  //     Future.delayed(const Duration(milliseconds: 1000), () {
+  //       Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => Homepage(uid: uid.toString()),
+  //           ));
+  //     });
+  //   } on FirebaseAuthException catch (e) {
+  //     String title = "";
+  //     switch (e.code) {
+  //       case 'account-exists-with-different-credential':
+  //         title = 'This account exist with a different sign in provider!';
+  //         break;
+  //       case 'invalid-credential':
+  //         title = "Unknown error has occurred";
+  //         break;
+  //     }
+  //     print(title);
+  //   } finally {
+  //     setState(() {
+  //       login = false;
+  //     });
+  //   }
+  // }
 
   void _loginwithgoogle() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
