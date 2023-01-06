@@ -4,6 +4,14 @@ import 'package:bitcointicker/CollaboratorInput.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+/********************************************************************************
+*Title: Flutter Tutorial - QR Code Scanner App [2021] & QR Code Generator
+*Author: Johannes Milke
+*Date: May 23, 2021
+*Code version: None
+*Availability: https://www.youtube.com/watch?v=hHehIGfX_yU&t=310s (Accessed 30 November, 2022)
+*********************************************************************************/
+
 class QRScanPage extends StatefulWidget {
   const QRScanPage({super.key});
 
