@@ -22,22 +22,48 @@ void updateGP(int value, String uid, BuildContext context) async {
           text: "You don't have enough GP");
     } else {
       docUser.update({'GP': FieldValue.increment(value)});
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          title: "Purchase Successfully!");
     }
   } else {
     docUser.update({'GP': FieldValue.increment(value)});
   }
 }
 
-void updateUserVoucher(String uid, String docId) async {
+void updateUserVoucher(
+    int value, String uid, String docId, BuildContext context) async {
   // FirebaseFirestore db = FirebaseFirestore.instance;
   // final CollectionReference voucherRef = db.collection("voucher");
   // await voucherRef
   //     .where('code', isEqualTo: code).
 
   // ;
-  final docVoucher =
-      FirebaseFirestore.instance.collection("voucher").doc(docId);
-  docVoucher.update({'user': uid});
+  final docUser = FirebaseFirestore.instance.collection("userProfile").doc(uid);
+  var data = await docUser.get();
+  var wallet = data['GP'];
+  print(wallet);
+  if (value < 0) {
+    if (wallet + value < 0) {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: "Oops...",
+          text: "You don't have enough GP");
+    } else {
+      docUser.update({'GP': FieldValue.increment(value)});
+      final docVoucher =
+          FirebaseFirestore.instance.collection("voucher").doc(docId);
+      docVoucher.update({'user': uid});
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          title: "Purchase Successfully!");
+    }
+  } else {
+    docUser.update({'GP': FieldValue.increment(value)});
+  }
 }
 
 class GpShop extends StatefulWidget {
@@ -345,14 +371,11 @@ class VoucherComponent extends StatelessWidget {
                           print("buttontapped");
                           QuickAlert.show(
                               onConfirmBtnTap: () {
-                                updateGP(-this.price, uid, context);
-                                updateUserVoucher(uid, docId);
+                                // updateGP(-this.price, uid, context);
+                                updateUserVoucher(
+                                    -this.price, uid, docId, context);
                                 // user = this.uid;
                                 Navigator.pop(context);
-                                QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Purchase Successfully!");
                               },
                               context: context,
                               type: QuickAlertType.confirm,
@@ -773,7 +796,7 @@ class ProductComponent extends StatelessWidget {
   static ProductComponent fromJSON(Map<String, dynamic> json) =>
       ProductComponent(
         brand: json['collaborator'],
-        itemName: json['description'],
+        itemName: json['name'],
         price: json['price']['cost'],
         imageUrl: json['image'],
         uid: "",
@@ -870,10 +893,6 @@ class ProductComponent extends StatelessWidget {
                               onConfirmBtnTap: () {
                                 updateGP(-this.price, uid, context);
                                 Navigator.pop(context);
-                                QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Purchase Successfully!");
                               },
                               context: context,
                               type: QuickAlertType.confirm,
