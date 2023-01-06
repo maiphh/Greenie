@@ -13,6 +13,7 @@ Greenie is an open source project about creating an android app for the purpose 
 * [Installation and Run](#installation-and-run)
 * [How to use](#how-to-use)
 * [Future](#future)
+* [References](#references)
 
 ## Techstack
 [![My Skills](https://skillicons.dev/icons?i=firebase,flutter,nodejs,vscode,figma,idea)](https://skillicons.dev)
@@ -22,7 +23,7 @@ You need to have Flutter and Android emulator preinstalled on your computer and 
 
 First, clone the repo to your chosen directory:
 
-        git clone something
+        git clone https://github.com/maiphh/Greenie.git
 
 Next, go into the root folder and run the following command:
 
@@ -38,3 +39,6 @@ Detail is in the user manual
 ## Future
 Here is our intention to improve our beloved project
  
+## References
+https://www.riftherald.com/lol-gameplay/2016/12/14/13957340/snowdown-crafting-lol-icons-skins-chests-sweets
+    
