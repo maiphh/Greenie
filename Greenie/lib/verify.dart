@@ -19,6 +19,14 @@ class _MyVerifyState extends State<MyVerify> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   String sms = "";
 
+ /*************************************************************** 
+ *Title: Verify UI 
+*Author: Optimizers 
+*Date: 30 November 2022 
+* Code version: V1 
+*Availability: https://github.com/snapsid/phonenumber-otp-flutter
+****************************************************************/ 
+    
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
