@@ -83,7 +83,7 @@ class _GpShopState extends State<GpShop> {
 /********************************************************************************
 *Title: Flutter TabBar and TabBarView Without Scaffold & AppBar | Custom Indicator & TabBarController
 *Author: dbestech
-*Date: November 11, 2021
+*Date: November 13, 2021
 *Code version: None
 *Availability: https://www.youtube.com/watch?v=m_MXkSKz_F8&t=1s (Accessed 25 November, 2022)
 *********************************************************************************/
