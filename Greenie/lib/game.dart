@@ -84,7 +84,15 @@ class _GameState extends State<Game> {
         'rare': rareCount
       };
     }
-
+  
+    /********************************************************************************
+          *Title: None
+          *Author: Johannes Milke
+          *Date: Apr 15, 2022
+          *Code version: None
+          *Availability: https://www.youtube.com/watch?v=ErP_xomHKTw (Accessed 15 December, 2022)
+          
+    *********************************************************************************/
     Stream<List<GameItem>> readGameItem() => FirebaseFirestore.instance
         .collection('gameItem')
         .snapshots()
