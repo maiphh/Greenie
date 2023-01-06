@@ -356,7 +356,6 @@ class countReward extends StatelessWidget {
   }
 }
 
-
 class TreeGrid extends StatefulWidget {
   const TreeGrid({super.key});
 
@@ -405,7 +404,7 @@ class displayGameInventory extends StatelessWidget {
       stream:
           FirebaseFirestore.instance.collection("gameInventory").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> sna) {
-        if (!sna.hasData) {
+        if (sna.hasError) {
           return Text("Something has gone wrong: $sna.error");
         }
         ;
