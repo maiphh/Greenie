@@ -1114,6 +1114,15 @@ class ClipShadowPath extends StatelessWidget {
   }
 }
 
+ /********************************************************************************
+          *Title: None
+          *Author: João Mello
+          *Date: Jan 1, 2019
+          *Code version: None
+          *Availability: https://gist.github.com/multiarts/6d732a5a99278ce359bbf16c005f7c85#file-clipshadowpath-dart (Accessed 17 December, 2022)
+          
+    *********************************************************************************/
+
 class _ClipShadowShadowPainter extends CustomPainter {
   final Shadow shadow;
   final CustomClipper<Path> clipper;
