@@ -43,6 +43,14 @@ Future<void> main() async {
     enableSound: true,
     showBadge: true,
   );
+  /********************************************************************************
+  *Title: Bug report
+  *Author: Repox
+  *Date: May 3, 2021
+  *Code version: None
+  *Availability: https://github.com/firebase/flutterfire/issues/6011 (Accessed 20 December, 2022)
+  *********************************************************************************/
+
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     announcement: false,
