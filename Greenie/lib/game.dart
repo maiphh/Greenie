@@ -144,6 +144,14 @@ class _GameState extends State<Game> {
               ),
             ),
           ),
+          /********************************************************************************
+          *Title: None
+          *Author: Viren V Varasadiya
+          *Date: Apr 28, 2020
+          *Code version: None
+          *Availability: https://stackoverflow.com/questions/61484143/flutter-how-do-i-use-await-inside-the-streambuilder (Accessed 26 December, 2022)
+          *********************************************************************************/
+
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
