@@ -233,6 +233,15 @@ class _MyPhoneState extends State<MyPhone> {
   Widget build(BuildContext context) {
     const IconData facebook = IconData(0xe255, fontFamily: 'MaterialIcons');
     String phone = "";
+    
+    /*************************************************************** 
+*Title: Login UI 
+*Author: Optimizers 
+*Date: 30 November 2022 
+* Code version: V1 
+*Availability: https://github.com/snapsid/phonenumber-otp-flutter
+****************************************************************/ 
+    
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.only(left: 25, right: 25),
