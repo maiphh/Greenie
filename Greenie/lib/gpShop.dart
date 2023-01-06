@@ -79,6 +79,16 @@ class _GpShopState extends State<GpShop> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    
+/********************************************************************************
+*Title: Flutter TabBar and TabBarView Without Scaffold & AppBar | Custom Indicator & TabBarController
+*Author: dbestech
+*Date: November 11, 2021
+*Code version: None
+*Availability: https://www.youtube.com/watch?v=m_MXkSKz_F8&t=1s (Accessed 25 November, 2022)
+*********************************************************************************/
+
+
     return Scaffold(
       body: DefaultTabController(
         length: 2,
